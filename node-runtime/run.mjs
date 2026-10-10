@@ -22,6 +22,8 @@ if (
 const child = spawn(
   process.execPath,
   [
+    // Node's FFI warning has no code, so it can only be suppressed by type.
+    "--disable-warning=ExperimentalWarning",
     "--experimental-ffi",
     "--import",
     path.join(root, "node-runtime/assets.mjs"),
