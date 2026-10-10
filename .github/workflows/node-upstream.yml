@@ -1,0 +1,74 @@
+name: Node upstream check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 4 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  rebase-and-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: node-runtime
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Rebase a temporary branch onto upstream dev
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add upstream https://github.com/anomalyco/opencode.git
+          git fetch --no-tags upstream dev
+          git switch -c upstream-check
+          git rebase FETCH_HEAD
+          echo "Rebased onto upstream $(git rev-parse --short FETCH_HEAD)" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26.11.1
+
+      - name: Install the rebased Node workspace
+        run: |
+          node node-runtime/setup.mjs --sync
+          node node-runtime/setup.mjs --no-frozen-lockfile
+
+      - name: Check command line entry points
+        run: |
+          node node-runtime/run.mjs opencode --version
+          node node-runtime/run.mjs lildax --help >/dev/null
+
+      - name: Check server health
+        shell: bash
+        run: |
+          set -euo pipefail
+          node node-runtime/run.mjs opencode serve --pure --port 4096 > "$RUNNER_TEMP/opencode-server.log" 2>&1 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:4096/global/health; then exit 0; fi
+            if ! kill -0 "$server" 2>/dev/null; then
+              cat "$RUNNER_TEMP/opencode-server.log"
+              exit 1
+            fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/opencode-server.log"
+          exit 1
+
+      - name: Check interactive terminal startup
+        shell: bash
+        run: |
+          set -uo pipefail
+          export TERM=xterm-256color
+          timeout --signal=INT --kill-after=5s 45s script -q -e -c 'stty rows 40 cols 120; node node-runtime/run.mjs opencode --pure' "$RUNNER_TEMP/opencode-tui.log" </dev/null >/dev/null 2>&1
+          status=$?
+          if [ "$status" -ne 124 ] || [ "$(wc -c < "$RUNNER_TEMP/opencode-tui.log")" -lt 2000 ]; then
+            tail -c 4000 "$RUNNER_TEMP/opencode-tui.log"
+            exit 1
+          fi

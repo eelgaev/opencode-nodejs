@@ -27,6 +27,8 @@ node node-runtime/setup.mjs --no-frozen-lockfile
 
 Review changes to Node-specific patches and `pnpm-lock.yaml` after each merge. The fork's root Bun files stay available for upstream development.
 
+The [weekly upstream check](../.github/workflows/node-upstream.yml) also rebases a temporary branch onto upstream `dev` and runs Node CLI, server, and TUI smoke checks on x86 Linux. It runs Mondays at 04:17 UTC and supports manual dispatch. It reports failures without pushing or changing `node-runtime`.
+
 ## Linux ppc64le native modules
 
 OpenTUI 0.4.5 has no published ppc64le library. Build its pinned Zig source with Zig 0.15.2 on a build machine, including an ARM64 or x64 cross build host:
