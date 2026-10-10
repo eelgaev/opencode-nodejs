@@ -28,7 +28,7 @@ const child = spawn(
     "--experimental-ffi",
     "--import",
     path.join(root, "node-runtime/assets.mjs"),
-    "src/index.ts",
+    name === "opencode" && process.argv.length === 3 ? path.join(root, "node-runtime/tui.mjs") : "src/index.ts",
     ...process.argv.slice(3),
   ],
   {
