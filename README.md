@@ -1,3 +1,15 @@
+> [!NOTE]
+> This fork's default branch, `node-runtime`, adds a secondary Node.js runtime to OpenCode. It tracks upstream `dev` while keeping the upstream Bun build and release flow.
+>
+> To run this fork from source with Node.js 26.4 or newer:
+>
+> ```sh
+> node node-runtime/setup.mjs --frozen-lockfile
+> node node-runtime/run.mjs opencode
+> ```
+>
+> See the [Node.js runtime guide](node-runtime/README.md) for `lildax`, ppc64le native modules, and upstream update steps. The published installation options below install upstream OpenCode.
+
 <p align="center">
   <a href="https://opencode.ai">
     <picture>

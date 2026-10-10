@@ -12,6 +12,21 @@ node node-runtime/run.mjs lildax --help
 
 `setup.mjs` installs with pnpm 10 and skips upstream install scripts that invoke Bun. It generates `pnpm-workspace.yaml` from the root catalog and Bun patches, plus the Node runtime patches. When upstream changes the catalog or workspace list, run `node node-runtime/setup.mjs --sync`, then `node node-runtime/setup.mjs --no-frozen-lockfile`, and review the lockfile. `node node-runtime/setup.mjs --check` checks that the generated workspace file is current.
 
+## Updating from upstream
+
+Keep upstream's `dev` branch as the base and merge it into this fork's `node-runtime` branch. Add the upstream remote once, then fetch and merge:
+
+```sh
+git remote add upstream https://github.com/anomalyco/opencode.git
+git fetch upstream dev
+git switch node-runtime
+git merge upstream/dev
+node node-runtime/setup.mjs --sync
+node node-runtime/setup.mjs --no-frozen-lockfile
+```
+
+Review changes to Node-specific patches and `pnpm-lock.yaml` after each merge. The fork's root Bun files stay available for upstream development.
+
 ## Linux ppc64le native modules
 
 OpenTUI 0.4.5 has no published ppc64le library. Build its pinned Zig source with Zig 0.15.2 on a build machine, including an ARM64 or x64 cross build host:
@@ -32,4 +47,4 @@ node node-runtime/build-addons.mjs
 
 The Node PTY adapter selects source-built `node-pty` on ppc64le and the upstream `@lydell/node-pty` package on other architectures. The watcher uses its local source build when no platform package exists.
 
-The manual [QEMU workflow](../.github/workflows/node-runtime.yml) runs the Node runtime on a regular GitHub hosted runner. It is dispatch-only while ppc64le testing is paused.
+The manual [QEMU workflow](../.github/workflows/node-runtime.yml) runs the Node runtime on a regular GitHub hosted runner. It is dispatch-only so cross-architecture checks remain opt-in.
