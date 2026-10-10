@@ -80,6 +80,27 @@ registerHooks({
     // Native buffer reuse can retain a clip from the previous frame.
     buffer.clearScissorRects();
     for (const renderable of this._ctx.getLifecyclePasses()) {`,
+          )
+          .replace(
+            `  const pointerArgIndexes = (definition.args ?? []).flatMap((type, index) => isNodePointerArgumentType(type) ? [index] : []);
+  if (pointerArgIndexes.length === 0) {`,
+            `  const pointerArgIndexes = (definition.args ?? []).flatMap((type, index) => isNodePointerArgumentType(type) ? [index] : []);
+  const unsignedArgIndexes = (definition.args ?? []).flatMap((type, index) => type === FFIType.u32 || type === FFIType.uint32_t ? [index] : []);
+  if (pointerArgIndexes.length === 0 && unsignedArgIndexes.length === 0) {`,
+          )
+          .replace(
+            `      normalizedArgs[index] = toNodePointerArgument(normalizedArgs[index]);
+    }
+    return fn(...normalizedArgs);`,
+            `      normalizedArgs[index] = toNodePointerArgument(normalizedArgs[index]);
+    }
+    // Render coordinates can be negative before the native buffer clips them.
+    // Bun wraps these to u32; Node's FFI rejects negative numbers.
+    for (const index of unsignedArgIndexes) {
+      if (typeof normalizedArgs[index] === "number" && normalizedArgs[index] < 0)
+        normalizedArgs[index] >>>= 0;
+    }
+    return fn(...normalizedArgs);`,
           ),
       }
     }
