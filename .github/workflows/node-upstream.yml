@@ -10,10 +10,10 @@ permissions:
 
 jobs:
   rebase-and-smoke:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: node-runtime
           fetch-depth: 0
@@ -32,11 +32,11 @@ jobs:
           git merge --no-ff upstream/dev -m "chore: merge upstream dev"
           echo "Testing upstream $(git rev-parse --short upstream/dev) merged into node-runtime" >> "$GITHUB_STEP_SUMMARY"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 26.11.1
 
-      - name: Install the rebased Node workspace
+      - name: Install the merged Node workspace
         run: |
           node node-runtime/setup.mjs --sync
           node node-runtime/setup.mjs --no-frozen-lockfile
