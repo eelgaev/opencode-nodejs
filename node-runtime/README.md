@@ -20,7 +20,7 @@ OpenTUI 0.4.5 has no published ppc64le library. Build its pinned Zig source with
 ZIG=/path/to/zig node node-runtime/build-opentui.mjs
 ```
 
-Copy `node-runtime/native/ppc64le/libopentui.so` into the same path on the ppc64le checkout. The runner finds it automatically; `OPENCODE_NODE_OPENTUI_LIB` can point to another location. The `@opentui/core` pnpm patch adds that override to the Node library loader. It is scoped to the pinned OpenTUI version, so an upstream OpenTUI update requires reviewing the patch and Zig build version.
+Copy `node-runtime/native/ppc64le/libopentui.so` into the same path on the ppc64le checkout. The runner finds it automatically; `OPENCODE_NODE_OPENTUI_LIB` can point to another location. The `@opentui/core` pnpm patch adds that override to the Node library loader and uses 8-byte pointers on ppc64le. It is scoped to the pinned OpenTUI version, so an upstream OpenTUI update requires reviewing the patch and Zig build version.
 
 After the pnpm install on ppc64le, build the PTY and filesystem watcher modules from source. On RHEL 8 with GCC 12 at `/opt/rh`:
 

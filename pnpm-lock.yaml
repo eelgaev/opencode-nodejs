@@ -216,7 +216,7 @@ patchedDependencies:
     hash: 6c3354fde497bc6a310b15e87b3c5675f066b738235ebffa82e0da90e2cfff84
     path: patches/@npmcli%2Fagent@4.0.2.patch
   '@opentui/core':
-    hash: b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a
+    hash: afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81
     path: patches/@opentui__core.patch
   '@pierre/trees@1.0.0-beta.4':
     hash: 9288191ef74b71771dc9299d822c0a3751ca743a88ab92987650e6a4f89d45e4
@@ -512,7 +512,7 @@ importers:
         version: link:../tui
       '@opentui/core':
         specifier: 'catalog:'
-        version: 0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@6.0.3)(web-tree-sitter@0.25.10)
+        version: 0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@6.0.3)(web-tree-sitter@0.25.10)
       '@opentui/solid':
         specifier: 'catalog:'
         version: 0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@6.0.3)(web-tree-sitter@0.25.10)
@@ -1637,7 +1637,7 @@ importers:
         version: 2.6.1(@opentelemetry/api@1.9.0)
       '@opentui/core':
         specifier: 'catalog:'
-        version: 0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@5.8.2)(web-tree-sitter@0.25.10)
+        version: 0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@5.8.2)(web-tree-sitter@0.25.10)
       '@opentui/keymap':
         specifier: 'catalog:'
         version: 0.4.5(@opentui/solid@0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@5.8.2)(web-tree-sitter@0.25.10))(react@18.2.0)(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@5.8.2)(web-tree-sitter@0.25.10)
@@ -1739,7 +1739,7 @@ importers:
         version: 0.0.1(@opencode-ai/plugin@packages+plugin)
       opentui-spinner:
         specifier: 'catalog:'
-        version: 0.0.7(@opentui/core@0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@5.8.2)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@5.8.2)(web-tree-sitter@0.25.10))(typescript@5.8.2)
+        version: 0.0.7(@opentui/core@0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@5.8.2)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@5.8.2)(web-tree-sitter@0.25.10))(typescript@5.8.2)
       partial-json:
         specifier: 0.1.7
         version: 0.1.7
@@ -1861,7 +1861,7 @@ importers:
     devDependencies:
       '@opentui/core':
         specifier: 'catalog:'
-        version: 0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@5.8.2)(web-tree-sitter@0.25.10)
+        version: 0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@5.8.2)(web-tree-sitter@0.25.10)
       '@opentui/keymap':
         specifier: 'catalog:'
         version: 0.4.5(@opentui/solid@0.4.5(solid-js@1.9.12)(typescript@5.8.2)(web-tree-sitter@0.25.10))(solid-js@1.9.12)(typescript@5.8.2)(web-tree-sitter@0.25.10)
@@ -2325,7 +2325,7 @@ importers:
         version: link:../ui
       '@opentui/core':
         specifier: 'catalog:'
-        version: 0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@6.0.3)(web-tree-sitter@0.25.10)
+        version: 0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@6.0.3)(web-tree-sitter@0.25.10)
       '@opentui/keymap':
         specifier: 'catalog:'
         version: 0.4.5(@opentui/solid@0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@6.0.3)(web-tree-sitter@0.25.10))(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@6.0.3)(web-tree-sitter@0.25.10)
@@ -2346,7 +2346,7 @@ importers:
         version: 3.1.0
       opentui-spinner:
         specifier: 'catalog:'
-        version: 0.0.7(@opentui/core@0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@6.0.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@6.0.3)(web-tree-sitter@0.25.10))(typescript@6.0.3)
+        version: 0.0.7(@opentui/core@0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@6.0.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@6.0.3)(web-tree-sitter@0.25.10))(typescript@6.0.3)
       remeda:
         specifier: 'catalog:'
         version: 2.26.0
@@ -18835,7 +18835,7 @@ snapshots:
   '@opentui/core-win32-x64@0.4.5':
     optional: true
 
-  '@opentui/core@0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@5.8.2)(web-tree-sitter@0.25.10)':
+  '@opentui/core@0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@5.8.2)(web-tree-sitter@0.25.10)':
     dependencies:
       bun-ffi-structs: 0.2.4(typescript@5.8.2)
       diff: 9.0.0
@@ -18855,7 +18855,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@opentui/core@0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@6.0.3)(web-tree-sitter@0.25.10)':
+  '@opentui/core@0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@6.0.3)(web-tree-sitter@0.25.10)':
     dependencies:
       bun-ffi-structs: 0.2.4(typescript@6.0.3)
       diff: 9.0.0
@@ -18877,7 +18877,7 @@ snapshots:
 
   '@opentui/keymap@0.4.5(@opentui/solid@0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@5.8.2)(web-tree-sitter@0.25.10))(react@18.2.0)(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@5.8.2)(web-tree-sitter@0.25.10)':
     dependencies:
-      '@opentui/core': 0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@5.8.2)(web-tree-sitter@0.25.10)
+      '@opentui/core': 0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@5.8.2)(web-tree-sitter@0.25.10)
     optionalDependencies:
       '@opentui/solid': 0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@5.8.2)(web-tree-sitter@0.25.10)
       react: 18.2.0
@@ -18888,7 +18888,7 @@ snapshots:
 
   '@opentui/keymap@0.4.5(@opentui/solid@0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@6.0.3)(web-tree-sitter@0.25.10))(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@6.0.3)(web-tree-sitter@0.25.10)':
     dependencies:
-      '@opentui/core': 0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@6.0.3)(web-tree-sitter@0.25.10)
+      '@opentui/core': 0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@6.0.3)(web-tree-sitter@0.25.10)
     optionalDependencies:
       '@opentui/solid': 0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@6.0.3)(web-tree-sitter@0.25.10)
       solid-js: 1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf)
@@ -18898,7 +18898,7 @@ snapshots:
 
   '@opentui/keymap@0.4.5(@opentui/solid@0.4.5(solid-js@1.9.12)(typescript@5.8.2)(web-tree-sitter@0.25.10))(solid-js@1.9.12)(typescript@5.8.2)(web-tree-sitter@0.25.10)':
     dependencies:
-      '@opentui/core': 0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@5.8.2)(web-tree-sitter@0.25.10)
+      '@opentui/core': 0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@5.8.2)(web-tree-sitter@0.25.10)
     optionalDependencies:
       '@opentui/solid': 0.4.5(solid-js@1.9.12)(typescript@5.8.2)(web-tree-sitter@0.25.10)
       solid-js: 1.9.12
@@ -18910,7 +18910,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.28.0
       '@babel/preset-typescript': 7.27.1(@babel/core@7.28.0)
-      '@opentui/core': 0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@5.8.2)(web-tree-sitter@0.25.10)
+      '@opentui/core': 0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@5.8.2)(web-tree-sitter@0.25.10)
       babel-plugin-module-resolver: 5.0.2
       babel-preset-solid: 1.9.12(@babel/core@7.28.0)(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))
       entities: 7.0.1
@@ -18925,7 +18925,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.28.0
       '@babel/preset-typescript': 7.27.1(@babel/core@7.28.0)
-      '@opentui/core': 0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@6.0.3)(web-tree-sitter@0.25.10)
+      '@opentui/core': 0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@6.0.3)(web-tree-sitter@0.25.10)
       babel-plugin-module-resolver: 5.0.2
       babel-preset-solid: 1.9.12(@babel/core@7.28.0)(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))
       entities: 7.0.1
@@ -18940,7 +18940,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.28.0
       '@babel/preset-typescript': 7.27.1(@babel/core@7.28.0)
-      '@opentui/core': 0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@5.8.2)(web-tree-sitter@0.25.10)
+      '@opentui/core': 0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@5.8.2)(web-tree-sitter@0.25.10)
       babel-plugin-module-resolver: 5.0.2
       babel-preset-solid: 1.9.12(@babel/core@7.28.0)(solid-js@1.9.12)
       entities: 7.0.1
@@ -26228,17 +26228,17 @@ snapshots:
       object-hash: 2.2.0
       oidc-token-hash: 5.2.0
 
-  opentui-spinner@0.0.7(@opentui/core@0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@5.8.2)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@5.8.2)(web-tree-sitter@0.25.10))(typescript@5.8.2):
+  opentui-spinner@0.0.7(@opentui/core@0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@5.8.2)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@5.8.2)(web-tree-sitter@0.25.10))(typescript@5.8.2):
     dependencies:
-      '@opentui/core': 0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@5.8.2)(web-tree-sitter@0.25.10)
+      '@opentui/core': 0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@5.8.2)(web-tree-sitter@0.25.10)
       cli-spinners: 3.4.0
       typescript: 5.8.2
     optionalDependencies:
       '@opentui/solid': 0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@5.8.2)(web-tree-sitter@0.25.10)
 
-  opentui-spinner@0.0.7(@opentui/core@0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@6.0.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@6.0.3)(web-tree-sitter@0.25.10))(typescript@6.0.3):
+  opentui-spinner@0.0.7(@opentui/core@0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@6.0.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.10(patch_hash=39237cb3d5579f537af78343c7d77e3e441a205372030bb742e03c87ada72cdf))(typescript@6.0.3)(web-tree-sitter@0.25.10))(typescript@6.0.3):
     dependencies:
-      '@opentui/core': 0.4.5(patch_hash=b695e353ef7069b2fa7aff56765ecb1f694535ae030e48add4178caf12d2987a)(typescript@6.0.3)(web-tree-sitter@0.25.10)
+      '@opentui/core': 0.4.5(patch_hash=afd01e6f5fb4f5f3bc50ae448054d13996973776f6da8faebeca5cfbba3ced81)(typescript@6.0.3)(web-tree-sitter@0.25.10)
       cli-spinners: 3.4.0
       typescript: 6.0.3
     optionalDependencies:

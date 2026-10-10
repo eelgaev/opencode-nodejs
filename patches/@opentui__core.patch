@@ -10,3 +10,8 @@ index be7df0e11bc6eac9ac8aacacdf2a4686670f09e1..542e483a590d83bf5b04abdbe37fe326
    const asset = getNativeAssetDescriptor(getCurrentNodeAssetTarget());
    const configuredPath = resolveAssetRootPath(asset.key);
    if (configuredPath !== undefined) {
+@@ -11025,3 +11026,3 @@ function fatalError(...args) {
+ }
+-var pointerSize = process.arch === "x64" || process.arch === "arm64" ? 8 : 4;
++var pointerSize = process.arch === "x64" || process.arch === "arm64" || process.arch === "ppc64" ? 8 : 4;
+ var isBun2 = typeof process !== "undefined" && "bun" in process.versions;
