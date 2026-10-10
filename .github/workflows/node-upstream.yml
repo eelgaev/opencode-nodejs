@@ -6,7 +6,7 @@ on:
     - cron: "17 4 * * 1"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   rebase-and-smoke:
@@ -19,15 +19,18 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Rebase a temporary branch onto upstream dev
+      - name: Check rebase and merge upstream dev
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote add upstream https://github.com/anomalyco/opencode.git
-          git fetch --no-tags upstream dev
+          git fetch --no-tags upstream +refs/heads/dev:refs/remotes/upstream/dev
           git switch -c upstream-check
-          git rebase FETCH_HEAD
-          echo "Rebased onto upstream $(git rev-parse --short FETCH_HEAD)" >> "$GITHUB_STEP_SUMMARY"
+          git rebase upstream/dev
+          git switch node-runtime
+          git switch -c upstream-merge
+          git merge --no-ff upstream/dev -m "chore: merge upstream dev"
+          echo "Testing upstream $(git rev-parse --short upstream/dev) merged into node-runtime" >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/setup-node@v4
         with:
@@ -75,3 +78,16 @@ jobs:
             tail -c 4000 "$RUNNER_TEMP/opencode-tui.log"
             exit 1
           fi
+
+      - name: Publish successful upstream merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add pnpm-workspace.yaml pnpm-lock.yaml
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(node): refresh workspace after upstream"
+          fi
+          git diff --exit-code
+          gh auth setup-git
+          git push origin HEAD:node-runtime
+          echo "Published node-runtime at $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
