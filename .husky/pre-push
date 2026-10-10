@@ -1,5 +1,13 @@
 #!/bin/sh
 set -e
+
+if [ -f node-runtime/run.mjs ]; then
+  node node-runtime/setup.mjs --check
+  node node-runtime/run.mjs opencode --version
+  node node-runtime/run.mjs lildax --help >/dev/null
+  exit 0
+fi
+
 # Check if bun version matches package.json
 # keep in sync with packages/script/src/index.ts semver qualifier
 bun -e '
