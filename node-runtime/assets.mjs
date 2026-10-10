@@ -9,7 +9,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const require = createRequire(import.meta.url)
 const cache = path.join(root, "node-runtime/.cache/transform")
 const cacheVersion = createHash("sha256")
-  .update(readFileSync(fileURLToPath(import.meta.url)))
+  .update(transform.toString())
   .update(readFileSync(path.join(root, "pnpm-lock.yaml")))
   .update(process.versions.node)
   .digest("hex")
@@ -94,6 +94,7 @@ function transform(file, source) {
     const { transformSync } = require("@babel/core")
     return transformSync(source, {
       filename: file,
+      cwd: root,
       configFile: false,
       babelrc: false,
       presets: [

@@ -14,7 +14,7 @@ node node-runtime/run.mjs lildax --help
 
 The Node asset loader provides named exports for the TUI's CommonJS `fuzzysort` dependency. This lets the upstream TUI source use its existing namespace imports under Node.
 
-The loader caches transformed TypeScript under `node-runtime/.cache/transform` to speed up later launches. Source changes, loader changes, lockfile changes, and Node version changes produce new cache entries. The directory is ignored by Git and can be deleted safely.
+The loader caches transformed TypeScript under `node-runtime/.cache/transform` to speed up later launches. Source changes, transform changes, lockfile changes, and Node version changes produce new cache entries. The directory is ignored by Git and can be deleted safely.
 
 Plain `opencode` launches use a focused TUI entrypoint and enable upstream's `OPENCODE_FAST_BOOT` mode. The screen appears while initial data sync continues in the background. Set `OPENCODE_FAST_BOOT=` to wait for sync before showing the screen. Other commands still use the full upstream CLI entrypoint. The runner preserves the directory where it was invoked, so shortcuts open the current project.
 
