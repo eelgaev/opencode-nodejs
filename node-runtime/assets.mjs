@@ -1,11 +1,18 @@
-import { existsSync, readFileSync } from "node:fs"
-import { registerHooks } from "node:module"
+import { createHash } from "node:crypto"
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs"
+import { createRequire, registerHooks } from "node:module"
+import { threadId } from "node:worker_threads"
 import path from "node:path"
 import { fileURLToPath, pathToFileURL } from "node:url"
-import ts from "typescript"
-import { transformSync } from "@babel/core"
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
+const require = createRequire(import.meta.url)
+const cache = path.join(root, "node-runtime/.cache/transform")
+const cacheVersion = createHash("sha256")
+  .update(readFileSync(fileURLToPath(import.meta.url)))
+  .update(readFileSync(path.join(root, "pnpm-lock.yaml")))
+  .update(process.versions.node)
+  .digest("hex")
 
 registerHooks({
   resolve(specifier, context, nextResolve) {
@@ -44,25 +51,23 @@ registerHooks({
     if (url.startsWith(pathToFileURL(path.join(root, "packages")).href) && /\.tsx?$/.test(new URL(url).pathname)) {
       const file = fileURLToPath(url)
       const source = readFileSync(file, "utf8")
+      const key = createHash("sha256").update(cacheVersion).update(file).update(source).digest("hex")
+      const target = path.join(cache, `${key}.js`)
+      const cached = existsSync(target) ? readFileSync(target, "utf8") : undefined
+      const code = cached ?? transform(file, source)
+      if (cached === undefined) {
+        try {
+          mkdirSync(cache, { recursive: true })
+          const temporary = `${target}.${process.pid}.${threadId}`
+          writeFileSync(temporary, code)
+          renameSync(temporary, target)
+        } catch {
+          // Source transforms still work when the checkout is read-only.
+        }
+      }
       return {
         format: "module",
-        source: file.endsWith(".tsx")
-          ? transformSync(source, {
-              filename: file,
-              configFile: false,
-              babelrc: false,
-              presets: [
-                ["babel-preset-solid", { moduleName: "@opentui/solid", generate: "universal" }],
-                ["@babel/preset-typescript", { allExtensions: true, isTSX: true }],
-              ],
-            }).code
-          : ts.transpileModule(source, {
-              fileName: file,
-              compilerOptions: {
-                module: ts.ModuleKind.ESNext,
-                target: ts.ScriptTarget.ESNext,
-              },
-            }).outputText,
+        source: code,
         shortCircuit: true,
       }
     }
@@ -83,3 +88,26 @@ registerHooks({
     return nextLoad(url, context)
   },
 })
+
+function transform(file, source) {
+  if (file.endsWith(".tsx")) {
+    const { transformSync } = require("@babel/core")
+    return transformSync(source, {
+      filename: file,
+      configFile: false,
+      babelrc: false,
+      presets: [
+        ["babel-preset-solid", { moduleName: "@opentui/solid", generate: "universal" }],
+        ["@babel/preset-typescript", { allExtensions: true, isTSX: true }],
+      ],
+    }).code
+  }
+  const ts = require("typescript")
+  return ts.transpileModule(source, {
+    fileName: file,
+    compilerOptions: {
+      module: ts.ModuleKind.ESNext,
+      target: ts.ScriptTarget.ESNext,
+    },
+  }).outputText
+}

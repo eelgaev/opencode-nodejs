@@ -14,6 +14,8 @@ node node-runtime/run.mjs lildax --help
 
 The Node asset loader provides named exports for the TUI's CommonJS `fuzzysort` dependency. This lets the upstream TUI source use its existing namespace imports under Node.
 
+The loader caches transformed TypeScript under `node-runtime/.cache/transform` to speed up later launches. Source changes, loader changes, lockfile changes, and Node version changes produce new cache entries. The directory is ignored by Git and can be deleted safely.
+
 ## Updating from upstream
 
 Keep upstream's `dev` branch as the base and merge it into this fork's `node-runtime` branch. Add the upstream remote once, then fetch and merge:
