@@ -1,18 +1,20 @@
 import { createHash } from "node:crypto"
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs"
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs"
 import { createRequire, registerHooks } from "node:module"
-import { threadId } from "node:worker_threads"
+import { isMainThread, threadId } from "node:worker_threads"
 import path from "node:path"
 import { fileURLToPath, pathToFileURL } from "node:url"
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const require = createRequire(import.meta.url)
 const cache = path.join(root, "node-runtime/.cache/transform")
+const lockfile = readFileSync(path.join(root, "pnpm-lock.yaml"))
 const cacheVersion = createHash("sha256")
   .update(transform.toString())
-  .update(readFileSync(path.join(root, "pnpm-lock.yaml")))
+  .update(lockfile)
   .update(process.versions.node)
   .digest("hex")
+const resolveCached = createResolveCache()
 
 registerHooks({
   resolve(specifier, context, nextResolve) {
@@ -45,7 +47,7 @@ registerHooks({
       ].find((item) => existsSync(item))
       if (file) return { url: pathToFileURL(file).href, shortCircuit: true }
     }
-    return nextResolve(specifier, context)
+    return resolveCached(specifier, context, nextResolve)
   },
   load(url, context, nextLoad) {
     if (url.startsWith(pathToFileURL(path.join(root, "packages")).href) && /\.tsx?$/.test(new URL(url).pathname)) {
@@ -88,6 +90,73 @@ registerHooks({
     return nextLoad(url, context)
   },
 })
+
+function createResolveCache() {
+  if (process.env.OPENCODE_NODE_RESOLVE_CACHE === "0") return (specifier, context, nextResolve) => nextResolve(specifier, context)
+
+  const manifest = path.join(root, "package.json")
+  const packages = (JSON.parse(readFileSync(manifest, "utf8")).workspaces?.packages ?? [])
+    .flatMap((entry) => {
+      if (!entry.endsWith("/*")) return [path.join(root, entry, "package.json")]
+      const directory = path.join(root, entry.slice(0, -2))
+      if (!existsSync(directory)) return []
+      return readdirSync(directory, { withFileTypes: true })
+        .filter((child) => child.isDirectory())
+        .map((child) => path.join(directory, child.name, "package.json"))
+    })
+    .filter((file) => existsSync(file))
+    .sort()
+  const hash = createHash("sha256")
+    .update(root)
+    .update(process.versions.node)
+    .update(process.platform)
+    .update(process.arch)
+    .update(readFileSync(fileURLToPath(import.meta.url)))
+    .update(lockfile)
+    .update(readFileSync(manifest))
+  packages.forEach((file) => hash.update(file).update(readFileSync(file)))
+  if (existsSync(path.join(root, "node_modules/.modules.yaml"))) {
+    hash.update(readFileSync(path.join(root, "node_modules/.modules.yaml")))
+  }
+
+  const file = path.join(root, "node-runtime/.cache/resolve", hash.digest("hex") + ".json")
+  const prefix = pathToFileURL(root).href + "/"
+  const entries = readResolveCache(file)
+  let dirty = false
+
+  process.on("exit", () => {
+    if (!isMainThread || !dirty) return
+    try {
+      mkdirSync(path.dirname(file), { recursive: true })
+      const temporary = `${file}.${process.pid}.${threadId}`
+      writeFileSync(temporary, JSON.stringify({ ...readResolveCache(file), ...entries }))
+      renameSync(temporary, file)
+    } catch {
+      // Module resolution still works when the checkout is read-only.
+    }
+  })
+
+  return (specifier, context, nextResolve) => {
+    if (!context.parentURL?.startsWith(prefix)) return nextResolve(specifier, context)
+    const key = JSON.stringify([specifier, context.parentURL, context.conditions, context.importAttributes])
+    if (entries[key]?.url?.startsWith(prefix)) return { ...entries[key], shortCircuit: true }
+    const result = nextResolve(specifier, context)
+    if (result.url.startsWith(prefix)) {
+      entries[key] = { url: result.url, format: result.format }
+      dirty = true
+    }
+    return result
+  }
+}
+
+function readResolveCache(file) {
+  try {
+    const data = JSON.parse(readFileSync(file, "utf8"))
+    return data && typeof data === "object" && !Array.isArray(data) ? data : {}
+  } catch {
+    return {}
+  }
+}
 
 function transform(file, source) {
   if (file.endsWith(".tsx")) {

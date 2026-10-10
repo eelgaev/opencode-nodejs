@@ -16,6 +16,8 @@ The Node asset loader provides named exports for the TUI's CommonJS `fuzzysort` 
 
 The loader caches transformed TypeScript under `node-runtime/.cache/transform` to speed up later launches. Source changes, transform changes, lockfile changes, and Node version changes produce new cache entries. The directory is ignored by Git and can be deleted safely.
 
+The loader also caches resolved module paths under `node-runtime/.cache/resolve`. It refreshes the cache when the loader, lockfile, workspace package manifests, pnpm installation metadata, Node version, or checkout path changes. Set `OPENCODE_NODE_RESOLVE_CACHE=0` to bypass it.
+
 Plain `opencode` launches use a focused TUI entrypoint and enable upstream's `OPENCODE_FAST_BOOT` mode. The screen appears while initial data sync continues in the background. Set `OPENCODE_FAST_BOOT=` to wait for sync before showing the screen. Other commands still use the full upstream CLI entrypoint. The runner preserves the directory where it was invoked, so shortcuts open the current project.
 
 ## Updating from upstream
