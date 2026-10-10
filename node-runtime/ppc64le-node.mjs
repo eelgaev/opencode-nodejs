@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto"
 import { createReadStream } from "node:fs"
-import { copyFile, mkdir, open, rename, stat, unlink } from "node:fs/promises"
+import { copyFile, mkdir, open, readFile, rename, stat, unlink, writeFile } from "node:fs/promises"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -14,11 +14,27 @@ const patches = [
 ]
 
 export async function prepareNode() {
+  const target = path.join(path.dirname(fileURLToPath(import.meta.url)), "native/ppc64le/node-ffi-fixed")
+  const cache = target + ".cache.json"
+  const sourceState = await stat(process.execPath, { bigint: true })
+  const targetState = await stat(target, { bigint: true }).catch(() => undefined)
+  const verified = await readFile(cache, "utf8").then(JSON.parse).catch(() => undefined)
+  if (
+    targetState &&
+    verified?.originalHash === originalHash &&
+    verified.patchedHash === patchedHash &&
+    verified.source === fingerprint(sourceState) &&
+    verified.target === fingerprint(targetState)
+  )
+    return target
+
   const sourceHash = await hash(process.execPath)
   if (sourceHash === patchedHash || sourceHash !== originalHash) return process.execPath
 
-  const target = path.join(path.dirname(fileURLToPath(import.meta.url)), "native/ppc64le/node-ffi-fixed")
-  if ((await stat(target).catch(() => undefined)) && (await hash(target)) === patchedHash) return target
+  if (targetState && (await hash(target)) === patchedHash) {
+    await remember(cache, sourceState, target)
+    return target
+  }
 
   await mkdir(path.dirname(target), { recursive: true })
   const temporary = `${target}.${process.pid}`
@@ -40,7 +56,25 @@ export async function prepareNode() {
   } finally {
     await unlink(temporary).catch(() => undefined)
   }
+  await remember(cache, sourceState, target)
   return target
+}
+
+async function remember(cache, sourceState, target) {
+  const targetState = await stat(target, { bigint: true })
+  await writeFile(
+    cache,
+    JSON.stringify({
+      originalHash,
+      patchedHash,
+      source: fingerprint(sourceState),
+      target: fingerprint(targetState),
+    }),
+  ).catch(() => undefined)
+}
+
+function fingerprint(state) {
+  return [state.dev, state.ino, state.size, state.mtimeNs, state.ctimeNs].join(":")
 }
 
 async function hash(file) {

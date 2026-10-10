@@ -34,3 +34,4 @@ logs/
 tsconfig.tsbuildinfo
 /artifacts/
 /node-runtime/native/ppc64le/node-ffi-fixed
+/node-runtime/native/ppc64le/node-ffi-fixed.cache.json
