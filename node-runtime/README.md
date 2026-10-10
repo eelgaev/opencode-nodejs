@@ -14,6 +14,8 @@ node node-runtime/run.mjs lildax --help
 
 The Node asset loader provides named exports for the TUI's CommonJS `fuzzysort` dependency. This lets the upstream TUI source use its existing namespace imports under Node.
 
+The loader also makes OpenTUI repaint after a resize that ends at the original cell dimensions. Rapid window resizing can otherwise leave the terminal cleared while OpenTUI skips the redraw. This Node-only adjustment leaves upstream sources untouched.
+
 The loader caches transformed TypeScript under `node-runtime/.cache/transform` to speed up later launches. Source changes, transform changes, lockfile changes, and Node version changes produce new cache entries. The directory is ignored by Git and can be deleted safely.
 
 The loader also caches resolved module paths under `node-runtime/.cache/resolve`. It refreshes the cache when the loader, lockfile, workspace package manifests, pnpm installation metadata, Node version, or checkout path changes. Set `OPENCODE_NODE_RESOLVE_CACHE=0` to bypass it.
