@@ -64,10 +64,13 @@ jobs:
       - name: Check interactive terminal startup
         shell: bash
         run: |
-          set -uo pipefail
+          set -euo pipefail
           export TERM=xterm-256color
-          timeout --signal=INT --kill-after=5s 45s script -q -e -c 'stty rows 40 cols 120; node node-runtime/run.mjs opencode --pure' "$RUNNER_TEMP/opencode-tui.log" </dev/null >/dev/null 2>&1
-          status=$?
+          if timeout --signal=INT --kill-after=5s 45s script -q -e -c 'stty rows 40 cols 120; node node-runtime/run.mjs opencode --pure' "$RUNNER_TEMP/opencode-tui.log" </dev/null >/dev/null 2>&1; then
+            status=0
+          else
+            status=$?
+          fi
           if [ "$status" -ne 124 ] || [ "$(wc -c < "$RUNNER_TEMP/opencode-tui.log")" -lt 2000 ]; then
             tail -c 4000 "$RUNNER_TEMP/opencode-tui.log"
             exit 1
