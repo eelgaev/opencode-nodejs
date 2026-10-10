@@ -1,6 +1,14 @@
 > [!NOTE]
 > This fork's default branch, `node-runtime`, adds a secondary Node.js runtime to OpenCode. It tracks upstream `dev` while keeping the upstream Bun build and release flow.
 >
+> Install the Node.js fork on Linux or macOS (the script installs Node.js 26 when needed):
+>
+> ```sh
+> curl -fsSL https://raw.githubusercontent.com/eelgaev/opencode-nodejs/node-runtime/node-runtime/install.sh | sh
+> ```
+>
+> The command installs `opencode` in `~/.local/bin`. Add that directory to your `PATH` if needed. Re-run the command to update. On ppc64le, the installer builds native modules and requires a C++ compiler, make, and Python 3.
+>
 > To run this fork from source with Node.js 26.4 or newer:
 >
 > ```sh
