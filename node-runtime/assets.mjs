@@ -56,19 +56,31 @@ registerHooks({
       const original = `  processResize(width, height) {
     if (width === this._terminalWidth && height === this._terminalHeight)
       return;`
-      if (!source.includes(original)) return result
       return {
         ...result,
-        source: source.replace(
-          original,
-          `  processResize(width, height) {
+        source: source
+          .replace(
+            original,
+            `  processResize(width, height) {
     if (width === this._terminalWidth && height === this._terminalHeight) {
       // A rapid resize can return to the same size after the terminal cleared its display.
       this.forceFullRepaintRequested = true;
       this.requestRender();
       return;
     }`,
-        ),
+          )
+          .replace(
+            `  render(buffer, deltaTime) {
+    if (!this.visible)
+      return;
+    for (const renderable of this._ctx.getLifecyclePasses()) {`,
+            `  render(buffer, deltaTime) {
+    if (!this.visible)
+      return;
+    // Native buffer reuse can retain a clip from the previous frame.
+    buffer.clearScissorRects();
+    for (const renderable of this._ctx.getLifecyclePasses()) {`,
+          ),
       }
     }
     if (url.startsWith(pathToFileURL(path.join(root, "packages")).href) && /\.tsx?$/.test(new URL(url).pathname)) {
