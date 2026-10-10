@@ -33,3 +33,4 @@ logs/
 *.bun-build
 tsconfig.tsbuildinfo
 /artifacts/
+/node-runtime/native/ppc64le/node-ffi-fixed

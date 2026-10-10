@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url"
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const opentui = path.join(root, "node-runtime/native/ppc64le/libopentui.so")
+const ppc64leNode = process.platform === "linux" && process.arch === "ppc64" ? await import("./ppc64le-node.mjs") : undefined
 const name = process.argv[2]
 if (name !== "opencode" && name !== "lildax") {
   console.error("Usage: node node-runtime/run.mjs <opencode|lildax> [args...]")
@@ -20,7 +21,7 @@ if (
 }
 
 const child = spawn(
-  process.execPath,
+  ppc64leNode ? await ppc64leNode.prepareNode() : process.execPath,
   [
     // Node's FFI warning has no code, so it can only be suppressed by type.
     "--disable-warning=ExperimentalWarning",

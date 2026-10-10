@@ -1,0 +1,21 @@
+diff --git a/deps/libffi/src/powerpc/linux64.S b/deps/libffi/src/powerpc/linux64.S
+--- a/deps/libffi/src/powerpc/linux64.S
++++ b/deps/libffi/src/powerpc/linux64.S
+@@ -78,7 +78,7 @@ ffi_call_LINUX64:
+ /* Save toc pointer, not for the ffi_prep_args64 call, but for the later
+    bctrl function call.  */
+ # if _CALL_ELF == 2
+-	std	%r2, 24(%r1)
++	std	%r2, 24(%r28)
+ # else
+ 	std	%r2, 40(%r1)
+ # endif
+@@ -170,7 +170,7 @@ ffi_call_LINUX64:
+ 	/* This must follow the call immediately, the unwinder
+ 	   uses this to find out if r2 has been saved or not.  */
+ # if _CALL_ELF == 2
+-	ld	%r2, 24(%r1)
++	ld	%r2, 24(%r28)
+ # else
+ 	ld	%r2, 40(%r1)
+ # endif
