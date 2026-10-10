@@ -7,7 +7,7 @@
 > curl -fsSL https://raw.githubusercontent.com/eelgaev/opencode-nodejs/node-runtime/node-runtime/install.sh | sh
 > ```
 >
-> The command installs `opencode` in `~/.local/bin`. Add that directory to your `PATH` if needed. Re-run the command to update. On ppc64le, the installer builds native modules and requires a C++ compiler, make, and Python 3.
+> The command installs `opencode` in `~/.local/bin`. Put that directory before any other OpenCode installation in your `PATH`. Re-run the command to update. On ppc64le, the installer builds native modules and requires a C++ compiler, make, and Python 3.
 >
 > To run this fork from source with Node.js 26.4 or newer:
 >

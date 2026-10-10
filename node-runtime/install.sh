@@ -150,6 +150,12 @@ fi
 
 printf '\nInstalled %s\n' "$bin_dir/opencode"
 case ":$PATH:" in
-  *":$bin_dir:"*) printf 'Run: opencode\n' ;;
-  *) printf 'Add %s to PATH, then run: opencode\n' "$bin_dir" ;;
+  *":$bin_dir:"*)
+    if [ "$(command -v opencode || true)" = "$bin_dir/opencode" ]; then
+      printf 'Run: opencode\n'
+    else
+      printf 'Put %s before other OpenCode installations in PATH, then run: opencode\n' "$bin_dir"
+    fi
+    ;;
+  *) printf 'Add %s to PATH before other OpenCode installations, then run: opencode\n' "$bin_dir" ;;
 esac
