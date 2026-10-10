@@ -9,6 +9,14 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 
 registerHooks({
   resolve(specifier, context, nextResolve) {
+    if (
+      specifier === "fuzzysort" &&
+      context.parentURL?.startsWith(pathToFileURL(path.join(root, "packages/tui")).href + "/")
+    ) {
+      const url = pathToFileURL(path.join(root, "node-runtime/fuzzysort.mjs"))
+      url.searchParams.set("source", nextResolve(specifier, context).url)
+      return { url: url.href, shortCircuit: true }
+    }
     if (specifier === "solid-js" || specifier.startsWith("solid-js/")) {
       return nextResolve(specifier, { ...context, conditions: ["browser", ...context.conditions] })
     }

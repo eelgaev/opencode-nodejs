@@ -12,6 +12,8 @@ node node-runtime/run.mjs lildax --help
 
 `setup.mjs` installs with pnpm 10 and skips upstream install scripts that invoke Bun. It generates `pnpm-workspace.yaml` from the root catalog and Bun patches, plus the Node runtime patches. When upstream changes the catalog or workspace list, run `node node-runtime/setup.mjs --sync`, then `node node-runtime/setup.mjs --no-frozen-lockfile`, and review the lockfile. `node node-runtime/setup.mjs --check` checks that the generated workspace file is current.
 
+The Node asset loader provides named exports for the TUI's CommonJS `fuzzysort` dependency. This lets the upstream TUI source use its existing namespace imports under Node.
+
 ## Updating from upstream
 
 Keep upstream's `dev` branch as the base and merge it into this fork's `node-runtime` branch. Add the upstream remote once, then fetch and merge:
