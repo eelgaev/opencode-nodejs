@@ -59,6 +59,9 @@ registerHooks({
       return {
         ...result,
         source: source
+          // A failed clipboard subprocess can raise SIGPIPE. Node handles the
+          // broken pipe as a stream error; it must not shut down the renderer.
+          .replace(`      "SIGBREAK",\n      "SIGPIPE",\n      "SIGBUS"`, `      "SIGBREAK",\n      "SIGBUS"`)
           .replace(
             original,
             `  processResize(width, height) {
