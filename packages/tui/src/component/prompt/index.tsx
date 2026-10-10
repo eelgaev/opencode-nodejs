@@ -1,3 +1,4 @@
+import { stringWidth } from "@opencode-ai/tui/util/string-width"
 import {
   BoxRenderable,
   RGBA,
@@ -509,7 +510,7 @@ export function Prompt(props: PromptProps) {
             parts: updatedNonTextParts,
           })
           restoreExtmarksFromParts(updatedNonTextParts)
-          input.cursorOffset = Bun.stringWidth(normalized)
+          input.cursorOffset = stringWidth(normalized)
         },
       },
       {

@@ -1,0 +1,12 @@
+diff --git a/chunk-node-q0cwyvm9.js b/chunk-node-q0cwyvm9.js
+index be7df0e11bc6eac9ac8aacacdf2a4686670f09e1..542e483a590d83bf5b04abdbe37fe326d1a16e76 100644
+--- a/chunk-node-q0cwyvm9.js
++++ b/chunk-node-q0cwyvm9.js
+@@ -7955,6 +7955,7 @@ function resolveTreeSitterWasm() {
+   return Promise.resolve(resolveAssetPath(TREE_SITTER_WASM_ASSET_KEY, () => new URL(import.meta.resolve(TREE_SITTER_WASM_ASSET_KEY))));
+ }
+ async function resolveNativeLibraryPath() {
++  if (process.env.OPENCODE_NODE_OPENTUI_LIB) return process.env.OPENCODE_NODE_OPENTUI_LIB;
+   const asset = getNativeAssetDescriptor(getCurrentNodeAssetTarget());
+   const configuredPath = resolveAssetRootPath(asset.key);
+   if (configuredPath !== undefined) {

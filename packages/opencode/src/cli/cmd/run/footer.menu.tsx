@@ -1,3 +1,4 @@
+import { stringWidth } from "@opencode-ai/tui/util/string-width"
 /** @jsxImportSource @opentui/solid */
 import { TextAttributes, type ColorInput } from "@opentui/core"
 import { useTerminalDimensions } from "@opentui/solid"
@@ -196,7 +197,7 @@ export function RunFooterMenu(props: {
       ...props
         .items()
         .filter((item) => item.description)
-        .map((item) => Bun.stringWidth(item.display)),
+        .map((item) => stringWidth(item.display)),
     )
     return width === 0 ? 0 : width + 2
   })
@@ -205,14 +206,14 @@ export function RunFooterMenu(props: {
       return ""
     }
 
-    return " ".repeat(Math.max(1, descriptionColumn() - Bun.stringWidth(item.display)))
+    return " ".repeat(Math.max(1, descriptionColumn() - stringWidth(item.display)))
   }
   const descriptionText = (item: RunFooterMenuItem) => {
     if (!item.description) {
       return
     }
 
-    const footerWidth = item.footer ? Bun.stringWidth(item.footer) + 1 : 0
+    const footerWidth = item.footer ? stringWidth(item.footer) + 1 : 0
     const available =
       term().width -
       (border() ? 1 : 0) -

@@ -1,0 +1,44 @@
+name: Node runtime ppc64le
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ppc64le:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build OpenTUI for ppc64le
+        run: |
+          curl -fsSL https://ziglang.org/download/0.15.2/zig-x86_64-linux-0.15.2.tar.xz | tar -xJ
+          ZIG="$PWD/zig-x86_64-linux-0.15.2/zig" node node-runtime/build-opentui.mjs
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ppc64le
+      - name: Check Node runtime under QEMU
+        run: |
+          docker run --rm --platform linux/ppc64le -v "$PWD:/workspace" -w /workspace ubuntu:24.04 bash -euxo pipefail -c '
+            apt-get update
+            DEBIAN_FRONTEND=noninteractive apt-get install -y ca-certificates curl xz-utils git python3 make g++
+            curl -fsSL https://nodejs.org/dist/v26.11.1/node-v26.11.1-linux-ppc64le.tar.xz | tar -xJ -C /opt
+            export PATH=/opt/node-v26.11.1-linux-ppc64le/bin:$PATH
+            node node-runtime/setup.mjs --frozen-lockfile
+            node node-runtime/build-addons.mjs
+            node node-runtime/run.mjs opencode --version
+            node node-runtime/run.mjs lildax --help
+            node node-runtime/run.mjs opencode serve --pure --port 4096 > /tmp/opencode-server.log 2>&1 &
+            server=$!
+            healthy=0
+            for attempt in $(seq 1 120); do
+              if curl -fsS http://127.0.0.1:4096/global/health 2>/dev/null; then healthy=1; break; fi
+              sleep 1
+            done
+            kill "$server"
+            test "$healthy" = 1
+            cd packages/opencode
+            OPENCODE_NODE_OPENTUI_LIB=/workspace/node-runtime/native/ppc64le/libopentui.so node --experimental-ffi -e "import(\"@opentui/core\").then(async ({createCliRenderer}) => { const renderer = await createCliRenderer({exitOnCtrlC:false}); renderer.destroy() })"
+          '

@@ -28,7 +28,11 @@
     "./editor": "./src/editor.ts",
     "./editor-zed": "./src/editor-zed.ts",
     "./runtime": "./src/runtime.tsx",
-    "./terminal-win32": "./src/terminal-win32.ts",
+    "./terminal-win32": {
+      "bun": "./src/terminal-win32.ts",
+      "node": "./src/terminal-win32.node.ts",
+      "default": "./src/terminal-win32.ts"
+    },
     "./config/keybind": "./src/config/keybind.ts",
     "./keymap": "./src/keymap.tsx",
     "./prompt/display": "./src/prompt/display.ts",
@@ -39,6 +43,7 @@
     "./util/error": "./src/util/error.ts",
     "./util/locale": "./src/util/locale.ts",
     "./util/persistence": "./src/util/persistence.ts",
+    "./util/string-width": "./src/util/string-width.ts",
     "./util/record": "./src/util/record.ts",
     "./logo": "./src/logo.ts",
     "./ui/dialog": "./src/ui/dialog.tsx",
@@ -46,6 +51,13 @@
     "./ui/toast": "./src/ui/toast.tsx",
     "./component/spinner": "./src/component/spinner.tsx",
     "./component/register-spinner": "./src/component/register-spinner.ts"
+  },
+  "imports": {
+    "#zed-sqlite": {
+      "bun": "./src/zed-sqlite.bun.ts",
+      "node": "./src/zed-sqlite.node.ts",
+      "default": "./src/zed-sqlite.bun.ts"
+    }
   },
   "dependencies": {
     "@opencode-ai/core": "workspace:*",
@@ -62,7 +74,8 @@
     "opentui-spinner": "catalog:",
     "remeda": "catalog:",
     "strip-ansi": "7.1.2",
-    "solid-js": "catalog:"
+    "solid-js": "catalog:",
+    "string-width": "7.2.0"
   },
   "devDependencies": {
     "@tsconfig/bun": "catalog:",

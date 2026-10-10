@@ -17,6 +17,7 @@ import type { Argv } from "yargs"
 import path from "path"
 import { pathToFileURL } from "url"
 import { open } from "node:fs/promises"
+import { text } from "node:stream/consumers"
 import { Effect } from "effect"
 import { UI } from "../ui"
 import { effectCmd } from "../effect-cmd"
@@ -413,7 +414,7 @@ export const RunCommand = effectCmd({
         }
       }
 
-      const piped = process.stdin.isTTY ? undefined : await Bun.stdin.text()
+      const piped = process.stdin.isTTY ? undefined : await text(process.stdin)
       message = resolveRunInput(message, piped) ?? ""
       const initialInput = resolveRunInput(rawMessage, piped)
 

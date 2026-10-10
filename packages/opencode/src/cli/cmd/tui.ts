@@ -1,6 +1,6 @@
 import { cmd } from "@/cli/cmd/cmd"
 import { Rpc } from "@/util/rpc"
-import { type rpc } from "../tui/worker"
+import type { rpc } from "../tui/worker"
 import path from "path"
 import { fileURLToPath } from "url"
 import { UI } from "@/cli/ui"
@@ -11,6 +11,8 @@ import { Filesystem } from "@/util/filesystem"
 import type { GlobalEvent } from "@opencode-ai/sdk/v2"
 import type { EventSource } from "@opencode-ai/tui/context/sdk"
 import { writeHeapSnapshot } from "v8"
+import { text } from "node:stream/consumers"
+import { Worker } from "node:worker_threads"
 import { ServerAuth } from "@/server/auth"
 import { validateSession } from "../tui/validate-session"
 import { win32InstallCtrlCGuard } from "@opencode-ai/tui/terminal-win32"
@@ -57,7 +59,7 @@ async function target() {
 }
 
 async function input(value?: string) {
-  const piped = process.stdin.isTTY ? undefined : await Bun.stdin.text()
+  const piped = process.stdin.isTTY ? undefined : await text(process.stdin)
   if (!value) return piped
   if (!piped) return value
   return piped + "\n" + value
@@ -207,11 +209,19 @@ export const TuiThreadCommand = cmd({
       }
       const cwd = Filesystem.resolve(process.cwd())
 
-      const worker = new Worker(file, {
-        env: Object.fromEntries(
-          Object.entries(process.env).filter((entry): entry is [string, string] => entry[1] !== undefined),
-        ),
-      })
+      const worker =
+        typeof Bun === "undefined"
+          ? new Worker(file, {
+              execArgv: process.execArgv,
+              env: Object.fromEntries(
+                Object.entries(process.env).filter((entry): entry is [string, string] => entry[1] !== undefined),
+              ),
+            })
+          : new globalThis.Worker(file, {
+              env: Object.fromEntries(
+                Object.entries(process.env).filter((entry): entry is [string, string] => entry[1] !== undefined),
+              ),
+            })
       const client = Rpc.client<typeof rpc>(worker)
       const reload = () => {
         client.call("reload", undefined).catch(() => {})

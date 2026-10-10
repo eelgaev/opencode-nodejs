@@ -1,12 +1,13 @@
 export * as Watcher from "./watcher"
 
 // @ts-ignore
-import { createWrapper } from "@parcel/watcher/wrapper"
+import { createWrapper } from "@parcel/watcher/wrapper.js"
 import type ParcelWatcher from "@parcel/watcher"
 import { makeLocationNode } from "../effect/app-node"
 import { Cause, Context, Effect, Layer } from "effect"
 import { FileSystemWatcher } from "@opencode-ai/schema/filesystem-watcher"
 import path from "path"
+import { createRequire } from "node:module"
 import { Config } from "../config"
 import { EventV2 } from "../event"
 import { Flag } from "../flag/flag"
@@ -20,6 +21,7 @@ import { Protected } from "./protected"
 declare const OPENCODE_LIBC: string | undefined
 
 const SUBSCRIBE_TIMEOUT_MS = 10_000
+const require = createRequire(import.meta.url)
 
 export const Event = FileSystemWatcher.Event
 
@@ -31,7 +33,11 @@ const watcher = lazy((): typeof import("@parcel/watcher") | undefined => {
     )
     return createWrapper(binding) as typeof import("@parcel/watcher")
   } catch {
-    return
+    try {
+      return require("@parcel/watcher") as typeof import("@parcel/watcher")
+    } catch {
+      return
+    }
   }
 })
 

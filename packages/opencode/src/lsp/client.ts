@@ -1,6 +1,6 @@
 import path from "path"
 import { pathToFileURL, fileURLToPath } from "url"
-import { createMessageConnection, StreamMessageReader, StreamMessageWriter } from "vscode-jsonrpc/node"
+import { createMessageConnection, StreamMessageReader, StreamMessageWriter } from "vscode-jsonrpc/node.js"
 import type { Diagnostic as VSCodeDiagnostic } from "vscode-languageserver-types"
 import { Process } from "@/util/process"
 import { LANGUAGE_EXTENSIONS } from "./language"

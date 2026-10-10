@@ -1,5 +1,3 @@
-import { runtimeModules as keymapRuntimeModules } from "@opentui/keymap/runtime-modules"
-import { ensureRuntimePluginSupport } from "@opentui/solid/runtime-plugin-support/configure"
 import {
   type TuiDispose,
   type TuiPlugin,
@@ -44,7 +42,11 @@ import { RuntimeFlags } from "@/effect/runtime-flags"
 import { Effect } from "effect"
 import { createPluginRuntime, type PluginRuntime, type TuiPluginHost } from "@opencode-ai/tui/plugin/runtime"
 
-ensureRuntimePluginSupport({ additional: keymapRuntimeModules })
+if (typeof Bun !== "undefined") {
+  const { runtimeModules } = await import("@opentui/keymap/runtime-modules")
+  const { ensureRuntimePluginSupport } = await import("@opentui/solid/runtime-plugin-support/configure")
+  ensureRuntimePluginSupport({ additional: runtimeModules })
+}
 
 type PluginLoad = {
   options: ConfigPluginV1.Options | undefined

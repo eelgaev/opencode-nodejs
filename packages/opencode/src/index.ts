@@ -117,11 +117,13 @@ const cli = yargs(args)
 
 try {
   if (args.includes("-h") || args.includes("--help")) {
-    await cli.parse(args, (err: Error | undefined, _argv: unknown, out: string) => {
-      if (err) throw err
-      if (!out) return
-      show(out)
-    })
+    await new Promise<void>((resolve, reject) =>
+      cli.parse(args, (err: Error | undefined, _argv: unknown, out: string) => {
+        if (err) return reject(err)
+        if (out) show(out)
+        resolve()
+      }),
+    )
   } else {
     await cli.parse()
   }
@@ -138,5 +140,5 @@ try {
   // Most notably, some docker-container-based MCP servers don't handle such signals unless
   // run using `docker run --init`.
   // Explicitly exit to avoid any hanging subprocesses.
-  process.exit()
+  if (typeof Bun !== "undefined") process.exit()
 }

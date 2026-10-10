@@ -1,3 +1,4 @@
+import { stringWidth } from "@opencode-ai/tui/util/string-width"
 // Session message extraction and prompt history.
 //
 // Fetches session messages from the SDK and extracts user turn text for
@@ -68,7 +69,7 @@ export function messagePrompt(msg: SessionMessages[number]): RunPrompt {
     })
     .map((part) => part.text)
     .join("")
-  let cursor = Bun.stringWidth(text)
+  let cursor = stringWidth(text)
   const used: Array<{ start: number; end: number }> = []
 
   const take = (value: string): { start: number; end: number; value: string } | undefined => {
@@ -79,8 +80,8 @@ export function messagePrompt(msg: SessionMessages[number]): RunPrompt {
         return undefined
       }
 
-      const start = Bun.stringWidth(text.slice(0, idx))
-      const end = start + Bun.stringWidth(value)
+      const start = stringWidth(text.slice(0, idx))
+      const end = start + stringWidth(value)
       if (!used.some((item) => item.start < end && start < item.end)) {
         return { start, end, value }
       }
@@ -91,9 +92,9 @@ export function messagePrompt(msg: SessionMessages[number]): RunPrompt {
 
   const add = (value: string) => {
     const gap = text ? " " : ""
-    const start = cursor + Bun.stringWidth(gap)
+    const start = cursor + stringWidth(gap)
     text += gap + value
-    const end = start + Bun.stringWidth(value)
+    const end = start + stringWidth(value)
     cursor = end
     return { start, end, value }
   }

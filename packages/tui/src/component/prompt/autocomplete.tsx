@@ -1,5 +1,6 @@
+import { stringWidth } from "@opencode-ai/tui/util/string-width"
 import type { BoxRenderable, TextareaRenderable, ScrollBoxRenderable } from "@opentui/core"
-import { pathToFileURL } from "bun"
+import { pathToFileURL } from "node:url"
 import fuzzysort from "fuzzysort"
 import path from "path"
 import { firstBy } from "remeda"
@@ -187,7 +188,7 @@ export function Autocomplete(props: {
 
     const virtualText = "@" + text
     const extmarkStart = store.index
-    const extmarkEnd = extmarkStart + Bun.stringWidth(virtualText)
+    const extmarkEnd = extmarkStart + stringWidth(virtualText)
 
     const styleId = part.type === "file" ? props.fileStyleId : part.type === "agent" ? props.agentStyleId : undefined
 
@@ -458,7 +459,7 @@ export function Autocomplete(props: {
           const cursor = props.input().logicalCursor
           props.input().deleteRange(0, 0, cursor.row, cursor.col)
           props.input().insertText(newText)
-          props.input().cursorOffset = Bun.stringWidth(newText)
+          props.input().cursorOffset = stringWidth(newText)
         },
       })
     }
