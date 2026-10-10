@@ -28,11 +28,12 @@ const child = spawn(
     "--experimental-ffi",
     "--import",
     path.join(root, "node-runtime/assets.mjs"),
-    name === "opencode" && process.argv.length === 3 ? path.join(root, "node-runtime/tui.mjs") : "src/index.ts",
+    name === "opencode" && process.argv.length === 3
+      ? path.join(root, "node-runtime/tui.mjs")
+      : path.join(root, "packages", name === "lildax" ? "cli" : "opencode", "src/index.ts"),
     ...process.argv.slice(3),
   ],
   {
-    cwd: path.join(root, "packages", name === "lildax" ? "cli" : "opencode"),
     stdio: "inherit",
     env: {
       ...process.env,
