@@ -1,3 +1,16 @@
+> [!NOTE]
+> This fork maintains two OpenCode release lines: [v1](https://github.com/eelgaev/opencode-nodejs/tree/v1) and [v2](https://github.com/eelgaev/opencode-nodejs/tree/v2). This default `v2` branch tracks upstream `v2`, whose CLI already has a Node.js build. The `v1` branch tracks upstream `v1` and has the fork's separate Node.js source runner and [installer](https://github.com/eelgaev/opencode-nodejs/blob/v1/node-runtime/README.md).
+>
+> To build the v2 Node.js CLI on Linux or macOS, install Bun and Node.js 26.4 or newer, then run:
+>
+> ```sh
+> bun install --frozen-lockfile
+> cd packages/cli
+> bun run script/build-node.ts --single --skip-install --outdir=dist/node
+> ```
+>
+> The binary is in `packages/cli/dist/node/cli-node-<platform>/bin/opencode2-node`. The [branch checks](.github/workflows/node-check.yml) run focused unit tests and a Node build and service check. The [weekly sync](.github/workflows/node-upstream.yml) merges upstream `v1` and `v2` independently and publishes each branch only after its checks pass. The installation options below install upstream OpenCode.
+
 <p align="center">
   <a href="https://opencode.ai">
     <picture>
