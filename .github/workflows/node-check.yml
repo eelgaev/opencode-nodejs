@@ -21,3 +21,22 @@ jobs:
           version: ${{ github.base_ref || github.ref_name }}
       - name: Check generated workspace files
         run: git diff --exit-code
+
+  ppc64le:
+    if: github.base_ref == 'v2' || github.ref_name == 'v2'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26.11.1
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: 0.16.0
+          use-cache: false
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ppc64le
+      - name: Build and check v2 under ppc64le emulation
+        run: sh node-runtime/check-ppc64le.sh

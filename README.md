@@ -2,31 +2,36 @@
 
 [![v2 tests](https://github.com/eelgaev/opencode-nodejs/actions/workflows/node-check.yml/badge.svg?branch=v2)](https://github.com/eelgaev/opencode-nodejs/actions/workflows/node-check.yml?query=branch%3Av2)
 
-This fork maintains two OpenCode release lines with working Node.js CLIs. This branch follows upstream **v2** and builds and tests its Node.js CLI. The [v1 branch](https://github.com/eelgaev/opencode-nodejs/tree/v1) follows upstream v1 and runs its CLI, terminal UI, and server through a Node.js source runner. Both lines have their own checks and are updated independently. The [main branch](https://github.com/eelgaev/opencode-nodejs) is the project landing page.
+This fork exists to run OpenCode on **Linux ppc64le with Node.js**. This branch follows upstream **v2**. The [v1 branch](https://github.com/eelgaev/opencode-nodejs/tree/v1) provides the earlier release line and its Node.js source runner. The [main branch](https://github.com/eelgaev/opencode-nodejs) explains both lines.
 
-## Build and run v2 from source
+## Build and run v2 on ppc64le
 
-The Node.js executable is built from this repository. Bun is the build tool; the resulting CLI runs under Node.js without Bun. With Bun and Node.js 26.4 or newer installed:
+V2 builds and runs with Node.js 26.11.1 and pnpm 10. Bun is not required. Install Git, Python 3, a C++ compiler, make, and Node.js 26.11.1 on the ppc64le machine. Then, from a v2 checkout:
 
 ```sh
-bun install --frozen-lockfile
-cd packages/cli
-bun run script/build-node.ts --single --skip-install --outdir=dist/node
-node dist-node/opencode.mjs --version
+node node-runtime/setup.mjs --frozen-lockfile --filter @opencode/cli... --filter @opencode/app...
+node node-runtime/build-addons.mjs
+node node-runtime/build.mjs
+node node-runtime/run.mjs --version
+node node-runtime/run.mjs --standalone
 ```
 
-The build writes a standalone executable in `packages/cli/dist/node/` for the host platform. CI verifies the Node.js build and service on Linux **x86_64**; build outputs are used for checks and are not published. For a Node-only install path, use the [v1 installer](https://github.com/eelgaev/opencode-nodejs/blob/v1/node-runtime/README.md).
+OpenTUI 0.5.17 does not publish a ppc64le library. Before `node-runtime/build.mjs`, build it with Zig 0.16.0 using `ZIG=/path/to/zig node node-runtime/build-opentui.mjs`. Zig 0.16.0 has no official ppc64le executable download, so run that cross build on an x86_64 or aarch64 Linux machine and copy `node-runtime/native/ppc64le/libopentui.so` into the same path on the ppc64le checkout. A locally built Zig 0.16.0 on ppc64le also works. The OpenTUI source is pinned to v0.5.17; the script checks the workspace version before building.
+
+The build produces `packages/cli/dist-node/opencode.mjs` plus local native assets and the web UI archive. The runner uses a private, verified Node FFI fix on ppc64le when it recognizes the affected official Node 26.11.1 binary. It does not alter system Node. See [the source patch](node-runtime/patches/node-libffi-ppc64le-toc.patch) for rebuilding Node instead. No binaries are published by this fork.
+
+On Linux aarch64 or x86_64, the same Node commands build the CLI using the prebuilt native packages. The v2 branch also retains its Bun development workflow from upstream; the commands above exercise this fork's Node path.
 
 ## Release lines
 
 | Branch | Upstream line | Node.js path | Command |
 | --- | --- | --- | --- |
 | [v1](https://github.com/eelgaev/opencode-nodejs/tree/v1) | v1 | [Installed source runner](https://github.com/eelgaev/opencode-nodejs/blob/v1/node-runtime/README.md); Linux and macOS | `opencode` |
-| **[v2](https://github.com/eelgaev/opencode-nodejs/tree/v2)** | v2 | Node.js CLI built from source; verified in CI | `opencode2-node` |
+| **[v2](https://github.com/eelgaev/opencode-nodejs/tree/v2)** | v2 | Node.js build from source, including ppc64le | `node node-runtime/run.mjs` |
 
 ## Checks and upstream updates
 
-The [v2 branch checks](.github/workflows/node-check.yml) run on pushes and pull requests. They run selected upstream unit tests under Node.js and Bun, build the Node.js CLI, and check its service and terminal UI startup. The [weekly upstream sync](.github/workflows/node-upstream.yml) tests v1 and v2 separately. It pushes each upstream merge only after that branch's checks pass.
+The [v2 branch checks](.github/workflows/node-check.yml) run selected upstream unit tests, build the Node.js CLI, and check its service and terminal UI startup. A separate ppc64le job cross builds OpenTUI, then uses QEMU to build and start v2 on ppc64le. The [weekly upstream sync](.github/workflows/node-upstream.yml) tests v1 and v2 separately before pushing merges.
 
 ## Upstream OpenCode
 

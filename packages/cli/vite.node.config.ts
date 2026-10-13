@@ -105,6 +105,23 @@ ${code.slice(start)}`
   }
 }
 
+function opentuiPpcPlugin(target: NodeTarget): Plugin {
+  return {
+    name: "opencode:opentui-ppc64le",
+    enforce: "pre",
+    transform(code, id) {
+      if (target.arch !== "ppc64" || !/\/@opentui\/core\/chunk-node-[^/]+\.js$/.test(id.replaceAll("\\", "/"))) return
+      const original = 'target.arch !== "arm64" && target.arch !== "x64"'
+      if (!code.includes(original)) this.error("OpenTUI native target check changed")
+      const pointerSize = 'process.arch === "x64" || process.arch === "arm64" ? 8 : 4'
+      if (!code.includes(pointerSize)) this.error("OpenTUI pointer width check changed")
+      return code
+        .replaceAll(original, `${original} && target.arch !== "ppc64"`)
+        .replace(pointerSize, 'process.arch === "x64" || process.arch === "arm64" || process.arch === "ppc64" ? 8 : 4')
+    },
+  }
+}
+
 const resolve = {
   alias: [
     { find: /^solid-js\/store$/, replacement: "solid-js/store/dist/store.js" },
@@ -238,12 +255,12 @@ process.env.OPENCODE_PHOTON_WASM_PATH = __ocPath.join(__ocAssetRoot, ${JSON.stri
 process.env.OPENCODE_TREE_SITTER_WASM_PATH = __ocPath.join(__ocAssetRoot, ${JSON.stringify(shellParserWasmAssets.runtime)})
 process.env.OPENCODE_TREE_SITTER_BASH_WASM_PATH = __ocPath.join(__ocAssetRoot, ${JSON.stringify(shellParserWasmAssets.bash)})
 process.env.OPENCODE_TREE_SITTER_POWERSHELL_WASM_PATH = __ocPath.join(__ocAssetRoot, ${JSON.stringify(shellParserWasmAssets.powershell)})
-process.env.FFF_BINARY_PATH = __ocPath.join(__ocAssetRoot, ${JSON.stringify(input.target.fffAsset)})
-process.env.OPENCODE_FFF_FFI_PATH = __ocPath.join(__ocAssetRoot, ${JSON.stringify(input.target.fffFfiAsset)})
+${input.target.fffAsset ? `process.env.FFF_BINARY_PATH = __ocPath.join(__ocAssetRoot, ${JSON.stringify(input.target.fffAsset)})` : ""}
+${input.target.fffFfiAsset ? `process.env.OPENCODE_FFF_FFI_PATH = __ocPath.join(__ocAssetRoot, ${JSON.stringify(input.target.fffFfiAsset)})` : ""}
 if (__ocPersistentPty && !process.env.OPENCODE_PTY_BIN) process.env.OPENCODE_PTY_BIN = __ocPath.join(__ocAssetRoot, __ocPersistentPty)
-try {
-  globalThis.__OPENCODE_FFF_FFI = require(process.env.OPENCODE_FFF_FFI_PATH)
-} catch {}
+if (process.env.OPENCODE_FFF_FFI_PATH) {
+  try { globalThis.__OPENCODE_FFF_FFI = require(process.env.OPENCODE_FFF_FFI_PATH) } catch {}
+}
 globalThis.__OPENCODE_PHOTON_WASM_PATH = process.env.OPENCODE_PHOTON_WASM_PATH
 if (process.platform === "linux") process.env.OPENTUI_LIBC = "glibc"`
 }
@@ -263,6 +280,7 @@ export function mainConfig(input: NodeBuildInput): UserConfig {
       rawTextPlugin(),
       runtimeRequirePlugin(),
       fffNodePlugin(),
+      opentuiPpcPlugin(input.target),
       simulationGraphPlugin(),
       solid({
         solid: {

@@ -1,3 +1,4 @@
+import { createReadStream } from "node:fs"
 import { stat } from "node:fs/promises"
 import path from "node:path"
 import { collectFiles } from "./files"
@@ -47,11 +48,8 @@ async function artifactFiles(target: string): Promise<string[]> {
 
 async function scan(file: string) {
   let trailing = ""
-  const reader = Bun.file(file).stream().getReader()
-  while (true) {
-    const chunk = await reader.read()
-    if (chunk.done) return
-    const text = trailing + Buffer.from(chunk.value).toString("latin1")
+  for await (const chunk of createReadStream(file)) {
+    const text = trailing + chunk.toString("latin1")
     const leaked = forbidden.find((marker) => text.includes(marker))
     if (leaked) throw new Error(`Artifact file ${file} contains forbidden simulation payload: ${leaked}`)
     trailing = text.slice(-overlap)
@@ -60,6 +58,6 @@ async function scan(file: string) {
 
 if (import.meta.main) {
   const target = process.argv[2]
-  if (!target) throw new Error("Usage: bun run script/verify-artifact.ts <file-or-directory>")
+  if (!target) throw new Error("Usage: node script/verify-artifact.ts <file-or-directory>")
   await verifyArtifact(target)
 }

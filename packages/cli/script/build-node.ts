@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 
 import { spawnSync } from "node:child_process"
 import { createHash } from "node:crypto"
@@ -6,15 +6,16 @@ import { chmod, copyFile, mkdir, mkdtemp, readFile, realpath, rename, rm, stat, 
 import os from "node:os"
 import path from "node:path"
 import { build } from "vite"
-import { Script } from "@opencode/script"
-import pkg from "../package.json"
+import pkg from "../package.json" with { type: "json" }
 import { collectNodeAssets, copyNodeAssets, hashNodeAssets, seaAssetMap } from "./node-assets"
 import { appArchiveAsset, mainConfig } from "../vite.node.config"
 import { nodeExecArgv, nodeTarget, type NodeTarget } from "../src/node/target"
 import { buildAppArchive } from "./app-assets"
 import { verifyArtifact } from "./verify-artifact"
 
-const NODE_VERSION = "26.4.0"
+const NODE_VERSION = "26.11.1"
+const channel = process.env.OPENCODE_CHANNEL ?? "local"
+const version = process.env.OPENCODE_VERSION ?? pkg.version
 const dir = path.resolve(import.meta.dirname, "..")
 const outdir = path.resolve(
   dir,
@@ -34,6 +35,7 @@ const requested = process.argv.find((arg) => arg.startsWith("--target="))?.slice
 const allTargets = [
   nodeTarget("linux", "arm64"),
   nodeTarget("linux", "x64"),
+  nodeTarget("linux", "ppc64"),
   nodeTarget("darwin", "arm64"),
   nodeTarget("win32", "arm64"),
   nodeTarget("win32", "x64"),
@@ -45,11 +47,11 @@ const targets = requested
     : allTargets
 
 process.chdir(dir)
-if (!skipInstall) run(process.execPath, ["install", "--os=*", "--cpu=*"])
+if (!skipInstall) throw new Error("Install dependencies first; pass --skip-install")
 if (appArchiveOnly) {
   if (!archivePath) throw new Error("--app-archive-only requires --app-archive=<path>")
   await mkdir(path.dirname(archivePath), { recursive: true })
-  await writeFile(archivePath, await buildAppArchive(Script.channel))
+  await writeFile(archivePath, await buildAppArchive(channel))
   process.exit(0)
 }
 if (targets.length === 0) {
@@ -59,7 +61,7 @@ if (targets.length === 0) {
 if (!bundleOnly && targets.some((target) => target.platform === "darwin" && target.arch === "x64")) {
   throw new Error("Node 26.4 SEA does not support macOS x64")
 }
-const appArchive = archivePath ? await Bun.file(archivePath).bytes() : await buildAppArchive(Script.channel)
+const appArchive = archivePath ? await readFile(archivePath) : await buildAppArchive(channel)
 if (!bundleOnly) await rm(outdir, { recursive: true, force: true })
 const builder =
   !bundleOnly || targets.some((target) => target.platform === process.platform && target.arch === process.arch)
@@ -91,8 +93,8 @@ for (const target of targets) {
   await rm("dist-node", { recursive: true, force: true })
   const assetHash = await hashNodeAssets(assets)
   const input = {
-    version: Script.version,
-    channel: Script.channel,
+    version,
+    channel,
     assetHash,
     target,
   }
@@ -139,7 +141,7 @@ for (const target of targets) {
     `${JSON.stringify(
       {
         name: `@opencode/${name}`,
-        version: Script.version,
+        version,
         license: pkg.license,
         repository: { type: "git", url: "git+https://github.com/anomalyco/opencode.git" },
         os: [target.platform],
@@ -174,7 +176,7 @@ async function resolveTargetNode(target: NodeTarget, host?: string) {
   if (host && target.platform === process.platform && target.arch === process.arch) return host
   const cache = path.resolve(dir, ".cache", "node")
   const platform = target.platform === "win32" ? "win" : target.platform
-  const archiveName = `node-v${NODE_VERSION}-${platform}-${target.arch}`
+  const archiveName = `node-v${NODE_VERSION}-${platform}-${target.arch === "ppc64" ? "ppc64le" : target.arch}`
   const targetDirectory = path.join(cache, archiveName)
   const executable = path.join(targetDirectory, target.platform === "win32" ? "node.exe" : "bin/node")
   if (
@@ -231,7 +233,7 @@ async function smoke(output: string) {
 }
 
 function targetName(target: NodeTarget) {
-  return `${target.platform === "win32" ? "windows" : target.platform}-${target.arch}`
+  return `${target.platform === "win32" ? "windows" : target.platform}-${target.arch === "ppc64" ? "ppc64le" : target.arch}`
 }
 
 function run(command: string, args: readonly string[], cwd = dir) {

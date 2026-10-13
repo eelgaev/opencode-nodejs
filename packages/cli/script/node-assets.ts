@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto"
 import { copyFile, mkdir, readFile, stat } from "node:fs/promises"
 import path from "node:path"
+import { createRequire } from "node:module"
 import { fileURLToPath } from "node:url"
 import { getNodeAssets } from "@opentui/core/node-assets"
 import { attentionSoundAssets, type NodeTarget, photonWasmAsset, shellParserWasmAssets } from "../src/node/target"
@@ -19,22 +20,45 @@ export type NodeAsset = {
 }
 
 export async function collectNodeAssets(target: NodeTarget) {
+  const ppc64le = target.platform === "linux" && target.arch === "ppc64"
   const opencodePty = await resolveOpencodePty({
     platform: target.platform,
     arch: target.arch,
     ...(target.platform === "linux" ? { libc: "glibc" as const } : {}),
   })
-  const ptyEntry = fileURLToPath(import.meta.resolve(target.nodePtyPackage))
+  const ptyEntry = ppc64le
+    ? createRequire(path.resolve(dir, "../../node-runtime/addons/package.json")).resolve("node-pty")
+    : fileURLToPath(import.meta.resolve(target.nodePtyPackage))
   const ptyRoot = path.resolve(path.dirname(ptyEntry), "..")
+  const coreRoot = path.dirname(fileURLToPath(import.meta.resolve("@opentui/core/node-assets")))
+  const opentuiAssets = ppc64le
+    ? [
+        { key: "@opentui/core-linux-ppc64/libopentui.so", source: path.resolve(dir, "../../node-runtime/native/ppc64le/libopentui.so") },
+        { key: "@opentui/core/parser.worker.js", source: path.join(coreRoot, "parser.worker.js") },
+        ...(await collectFiles(path.join(coreRoot, "assets"))).map((key) => ({
+          key: `@opentui/core/assets/${key.replaceAll(path.sep, "/")}`,
+          source: path.join(coreRoot, "assets", key),
+        })),
+      ]
+    : getNodeAssets({
+        platform: target.platform,
+        arch: target.arch as "arm64" | "x64",
+        ...(target.platform === "linux" ? { libc: "glibc" as const } : {}),
+      })
   const assets: NodeAsset[] = [
-    ...getNodeAssets({
-      platform: target.platform,
-      arch: target.arch,
-      ...(target.platform === "linux" ? { libc: "glibc" as const } : {}),
-    }),
-    { key: target.parcelWatcherAsset, source: fileURLToPath(import.meta.resolve(target.parcelWatcherPackage)) },
-    { key: target.fffAsset, source: fileURLToPath(import.meta.resolve(target.fffPackage)) },
-    { key: target.fffFfiAsset, source: fileURLToPath(import.meta.resolve(target.fffFfiPackage)) },
+    ...opentuiAssets,
+    {
+      key: target.parcelWatcherAsset,
+      source: ppc64le
+        ? path.dirname(createRequire(path.resolve(dir, "../core/package.json")).resolve("@parcel/watcher/package.json")) + "/build/Release/watcher.node"
+        : fileURLToPath(import.meta.resolve(target.parcelWatcherPackage)),
+    },
+    ...(target.fffAsset && target.fffPackage
+      ? [{ key: target.fffAsset, source: fileURLToPath(import.meta.resolve(target.fffPackage)) }]
+      : []),
+    ...(target.fffFfiAsset && target.fffFfiPackage
+      ? [{ key: target.fffFfiAsset, source: fileURLToPath(import.meta.resolve(target.fffFfiPackage)) }]
+      : []),
     {
       key: photonWasmAsset,
       source: fileURLToPath(import.meta.resolve(photonWasmAsset)),

@@ -114,7 +114,7 @@ runs:
       if: inputs.version == 'v2'
       shell: bash
       working-directory: packages/cli
-      run: bun run script/build-node.ts --single --skip-install --outdir=dist/node
+      run: node --import ../../node-runtime/loader.mjs script/build-node.ts --single --skip-install --outdir=dist/node
 
     - name: Check v2 Node service
       if: inputs.version == 'v2'

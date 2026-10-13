@@ -16,3 +16,11 @@ test("collects each SEA asset key once", async () => {
     },
   ])
 })
+
+test("maps Node's ppc64 architecture to the ppc64le source build", () => {
+  const target = nodeTarget("linux", "ppc64")
+  expect(target.nodePtyPackage).toBe("node-pty")
+  expect(target.parcelWatcherAsset).toBe("@parcel/watcher/watcher.node")
+  expect(target.fffAsset).toBeUndefined()
+  expect(target.opencodePtyAsset).toBeUndefined()
+})
