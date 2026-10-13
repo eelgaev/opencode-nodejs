@@ -9,7 +9,8 @@
 > bun run script/build-node.ts --single --skip-install --outdir=dist/node
 > ```
 >
-> The binary is in `packages/cli/dist/node/cli-node-<platform>/bin/opencode2-node`. The [branch checks](.github/workflows/node-check.yml) run focused unit tests and a Node build and service check. The [weekly sync](.github/workflows/node-upstream.yml) merges upstream `v1` and `v2` independently and publishes each branch only after its checks pass. The installation options below install upstream OpenCode.
+> The binary is in `packages/cli/dist/node/cli-node-<platform>/bin/opencode2-node`. The [branch checks](.github/workflows/node-check.yml) run focused Bun and Node unit tests plus a Node build and service check. The [weekly sync](.github/workflows/node-upstream.yml) merges upstream `v1` and `v2` independently and publishes each branch only after its checks pass. The installation options below install upstream OpenCode.
+> The Node test gate reuses selected upstream test files that do not call Bun APIs. The full upstream suite still runs with Bun.
 
 <p align="center">
   <a href="https://opencode.ai">
