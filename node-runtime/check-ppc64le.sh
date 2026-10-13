@@ -9,6 +9,7 @@ docker run --rm --platform linux/ppc64le -v "$PWD:/workspace" -w /workspace ubun
   DEBIAN_FRONTEND=noninteractive apt-get install -y ca-certificates curl xz-utils git python3 make g++
   curl -fsSL https://nodejs.org/dist/v26.11.1/node-v26.11.1-linux-ppc64le.tar.xz | tar -xJ -C /opt
   export PATH=/opt/node-v26.11.1-linux-ppc64le/bin:$PATH
+  export CI=true
   node node-runtime/setup.mjs --frozen-lockfile --filter @opencode/cli... --filter @opencode/app...
   node node-runtime/build-addons.mjs
   node node-runtime/build.mjs
