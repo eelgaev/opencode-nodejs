@@ -24,20 +24,20 @@ Plain `opencode` launches use a focused TUI entrypoint and enable upstream's `OP
 
 ## Updating from upstream
 
-Keep upstream's `dev` branch as the base and merge it into this fork's `node-runtime` branch. Add the upstream remote once, then fetch and merge:
+Keep upstream's `v1` branch as the base and merge it into this fork's `v1` branch. Add the upstream remote once, then fetch and merge:
 
 ```sh
 git remote add upstream https://github.com/anomalyco/opencode.git
-git fetch upstream dev
-git switch node-runtime
-git merge upstream/dev
+git fetch upstream v1
+git switch v1
+git merge upstream/v1
 node node-runtime/setup.mjs --sync
 node node-runtime/setup.mjs --no-frozen-lockfile
 ```
 
 Review changes to Node-specific patches and `pnpm-lock.yaml` after each merge. The fork's root Bun files stay available for upstream development.
 
-The fork keeps only `node-upstream.yml` and `node-runtime.yml` under `.github/workflows`. When updating manually, remove any upstream workflows added by a merge before committing. The [weekly upstream check](../.github/workflows/node-upstream.yml) merges upstream `dev`, removes inherited workflows (including resolving conflicts caused by their removal), and tests the Node CLI, server, and TUI on x86 Linux. When every check passes, it pushes the merge to `node-runtime`. It runs Mondays at 04:17 UTC and supports manual dispatch. A failed check leaves the default branch unchanged.
+The fork keeps `node-check.yml`, `node-upstream.yml`, and `node-runtime.yml` under `.github/workflows`. When updating manually, remove any upstream workflows added by a merge before committing. The [weekly upstream sync](../.github/workflows/node-upstream.yml) runs from the fork's default `v2` branch and updates `v1` and `v2` independently. It runs focused unit tests and Node smoke checks before pushing either merge. It runs Mondays at 04:17 UTC and supports manual dispatch. A failed check leaves that branch unchanged. The [branch checks](../.github/workflows/node-check.yml) also run on pushes and pull requests to each branch.
 
 ## Linux ppc64le native modules
 

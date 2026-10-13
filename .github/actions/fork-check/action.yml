@@ -1,0 +1,99 @@
+name: Check Node fork
+description: Run focused unit tests and the Node CLI smoke checks for one release line
+inputs:
+  version:
+    description: Fork branch to check (v1 or v2)
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: ./.github/actions/setup-bun
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.version == 'v1' && '26.11.1' || '26.4.0' }}
+
+    - name: Test v1 CLI configuration
+      if: inputs.version == 'v1'
+      shell: bash
+      working-directory: packages/opencode
+      run: bun test test/config/entry-name.test.ts test/permission/arity.test.ts
+
+    - name: Test v1 core policy
+      if: inputs.version == 'v1'
+      shell: bash
+      working-directory: packages/core
+      run: bun test test/policy.test.ts
+
+    - name: Test v2 Node assets
+      if: inputs.version == 'v2'
+      shell: bash
+      working-directory: packages/cli
+      run: bun test test/node-assets.test.ts
+
+    - name: Test v2 file access
+      if: inputs.version == 'v2'
+      shell: bash
+      working-directory: packages/core
+      run: bun test test/file-access-path.test.ts
+
+    - name: Install v1 Node workspace
+      if: inputs.version == 'v1'
+      shell: bash
+      run: |
+        node node-runtime/setup.mjs --sync
+        node node-runtime/setup.mjs --no-frozen-lockfile
+
+    - name: Check v1 CLI entry points
+      if: inputs.version == 'v1'
+      shell: bash
+      run: |
+        node node-runtime/run.mjs opencode --version
+        node node-runtime/run.mjs lildax --help >/dev/null
+
+    - name: Check v1 server health
+      if: inputs.version == 'v1'
+      shell: bash
+      run: |
+        set -euo pipefail
+        node node-runtime/run.mjs opencode serve --pure --port 4096 > "$RUNNER_TEMP/opencode-server.log" 2>&1 &
+        server=$!
+        trap 'kill "$server" 2>/dev/null || true' EXIT
+        for attempt in $(seq 1 60); do
+          if curl -fsS http://127.0.0.1:4096/global/health; then exit 0; fi
+          if ! kill -0 "$server" 2>/dev/null; then
+            cat "$RUNNER_TEMP/opencode-server.log"
+            exit 1
+          fi
+          sleep 1
+        done
+        cat "$RUNNER_TEMP/opencode-server.log"
+        exit 1
+
+    - name: Check v1 terminal startup
+      if: inputs.version == 'v1'
+      shell: bash
+      run: |
+        set -euo pipefail
+        export TERM=xterm-256color
+        if timeout --signal=INT --kill-after=5s 45s script -q -e -c 'stty rows 40 cols 120; node node-runtime/run.mjs opencode --pure' "$RUNNER_TEMP/opencode-tui.log" </dev/null >/dev/null 2>&1; then
+          status=0
+        else
+          status=$?
+        fi
+        if [ "$status" -ne 124 ] || [ "$(wc -c < "$RUNNER_TEMP/opencode-tui.log")" -lt 2000 ]; then
+          tail -c 4000 "$RUNNER_TEMP/opencode-tui.log"
+          exit 1
+        fi
+
+    - name: Build v2 Node CLI
+      if: inputs.version == 'v2'
+      shell: bash
+      working-directory: packages/cli
+      run: bun run script/build-node.ts --single --skip-install --outdir=dist/node
+
+    - name: Check v2 Node service
+      if: inputs.version == 'v2'
+      shell: bash
+      working-directory: packages/cli
+      run: bun run script/service-smoke.ts --node

@@ -1,10 +1,10 @@
 > [!NOTE]
-> This fork's default branch, `node-runtime`, adds a secondary Node.js runtime to OpenCode. It tracks upstream `dev` while keeping the upstream Bun build and release flow.
+> This fork maintains [v1](https://github.com/eelgaev/opencode-nodejs/tree/v1) and [v2](https://github.com/eelgaev/opencode-nodejs/tree/v2) branches. This `v1` branch tracks upstream `v1` and adds a secondary Node.js runtime. The `v2` branch tracks upstream `v2`, which includes its own Node CLI build.
 >
 > Install the Node.js fork on Linux or macOS (the script installs Node.js 26 when needed):
 >
 > ```sh
-> curl -fsSL https://raw.githubusercontent.com/eelgaev/opencode-nodejs/node-runtime/node-runtime/install.sh | sh
+> curl -fsSL https://raw.githubusercontent.com/eelgaev/opencode-nodejs/v1/node-runtime/install.sh | sh
 > ```
 >
 > The command installs `opencode` in `~/.local/bin`. Put that directory before any other OpenCode installation in your `PATH`. Re-run the command to update. On ppc64le, the installer builds native modules and requires a C++ compiler, make, and Python 3.
@@ -16,7 +16,7 @@
 > node node-runtime/run.mjs opencode
 > ```
 >
-> See the [Node.js runtime guide](node-runtime/README.md) for `lildax`, ppc64le native modules, and upstream update steps. The published installation options below install upstream OpenCode.
+> See the [v1 Node.js runtime guide](node-runtime/README.md) for `lildax`, ppc64le native modules, and upstream update steps. [Branch checks](.github/workflows/node-check.yml) run on pushes and pull requests; the [weekly sync](.github/workflows/node-upstream.yml) updates both branches only after tests and Node smoke checks pass. The published installation options below install upstream OpenCode.
 
 <p align="center">
   <a href="https://opencode.ai">

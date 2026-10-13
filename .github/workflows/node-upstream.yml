@@ -1,4 +1,4 @@
-name: Node upstream check
+name: Node upstream sync
 
 on:
   workflow_dispatch:
@@ -8,38 +8,48 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: node-upstream-sync
+  cancel-in-progress: false
+
 jobs:
-  merge-and-smoke:
+  update:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [v1, v2]
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
         with:
-          ref: node-runtime
+          ref: ${{ matrix.version }}
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Merge upstream dev and keep fork workflows
+      - name: Merge upstream ${{ matrix.version }} and keep fork workflows
+        shell: bash
+        env:
+          VERSION: ${{ matrix.version }}
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote add upstream https://github.com/anomalyco/opencode.git
-          git fetch --no-tags upstream +refs/heads/dev:refs/remotes/upstream/dev
+          git fetch --no-tags upstream "+refs/heads/$VERSION:refs/remotes/upstream/$VERSION"
           git switch -c upstream-merge
-          if ! git merge --no-ff --no-commit upstream/dev; then
+          if ! git merge --no-ff --no-commit "upstream/$VERSION"; then
             if [ -z "$(git diff --name-only --diff-filter=U)" ]; then
               echo "Upstream merge failed without a resolvable conflict" >&2
               exit 1
             fi
             while IFS= read -r -d '' file; do
               case "$file" in
-                .github/workflows/node-upstream.yml|.github/workflows/node-runtime.yml)
+                .github/workflows/node-check.yml|.github/workflows/node-upstream.yml|.github/workflows/node-runtime.yml)
                   echo "Conflict in a fork workflow: $file" >&2
                   exit 1
                   ;;
-                .github/workflows/*)
-                  git rm -f -- "$file"
-                  ;;
+                .github/workflows/*) git rm -f -- "$file" ;;
                 *)
                   echo "Unresolved upstream conflict: $file" >&2
                   exit 1
@@ -49,7 +59,7 @@ jobs:
           fi
           while IFS= read -r -d '' file; do
             case "$file" in
-              .github/workflows/node-upstream.yml|.github/workflows/node-runtime.yml) ;;
+              .github/workflows/node-check.yml|.github/workflows/node-upstream.yml|.github/workflows/node-runtime.yml) ;;
               *) git rm -f -- "$file" ;;
             esac
           done < <(git ls-files -z .github/workflows)
@@ -58,66 +68,28 @@ jobs:
             exit 1
           fi
           if [ -f "$(git rev-parse --git-path MERGE_HEAD)" ]; then
-            git commit -m "chore: merge upstream dev"
+            git commit -m "chore: merge upstream $VERSION"
           fi
-          echo "Testing upstream $(git rev-parse --short upstream/dev) merged into node-runtime" >> "$GITHUB_STEP_SUMMARY"
+          echo "Testing upstream $VERSION $(git rev-parse --short "upstream/$VERSION")" >> "$GITHUB_STEP_SUMMARY"
 
-      - uses: actions/setup-node@v7
+      - uses: ./.github/actions/fork-check
         with:
-          node-version: 26.11.1
-
-      - name: Install the merged Node workspace
-        run: |
-          node node-runtime/setup.mjs --sync
-          node node-runtime/setup.mjs --no-frozen-lockfile
-
-      - name: Check command line entry points
-        run: |
-          node node-runtime/run.mjs opencode --version
-          node node-runtime/run.mjs lildax --help >/dev/null
-
-      - name: Check server health
-        shell: bash
-        run: |
-          set -euo pipefail
-          node node-runtime/run.mjs opencode serve --pure --port 4096 > "$RUNNER_TEMP/opencode-server.log" 2>&1 &
-          server=$!
-          trap 'kill "$server" 2>/dev/null || true' EXIT
-          for attempt in $(seq 1 60); do
-            if curl -fsS http://127.0.0.1:4096/global/health; then exit 0; fi
-            if ! kill -0 "$server" 2>/dev/null; then
-              cat "$RUNNER_TEMP/opencode-server.log"
-              exit 1
-            fi
-            sleep 1
-          done
-          cat "$RUNNER_TEMP/opencode-server.log"
-          exit 1
-
-      - name: Check interactive terminal startup
-        shell: bash
-        run: |
-          set -euo pipefail
-          export TERM=xterm-256color
-          if timeout --signal=INT --kill-after=5s 45s script -q -e -c 'stty rows 40 cols 120; node node-runtime/run.mjs opencode --pure' "$RUNNER_TEMP/opencode-tui.log" </dev/null >/dev/null 2>&1; then
-            status=0
-          else
-            status=$?
-          fi
-          if [ "$status" -ne 124 ] || [ "$(wc -c < "$RUNNER_TEMP/opencode-tui.log")" -lt 2000 ]; then
-            tail -c 4000 "$RUNNER_TEMP/opencode-tui.log"
-            exit 1
-          fi
+          version: ${{ matrix.version }}
 
       - name: Publish successful upstream merge
         env:
+          VERSION: ${{ matrix.version }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          git add pnpm-workspace.yaml pnpm-lock.yaml
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(node): refresh workspace after upstream"
+          set -euo pipefail
+          if [ "$VERSION" = v1 ]; then
+            git add pnpm-workspace.yaml pnpm-lock.yaml
+            if ! git diff --cached --quiet; then
+              git commit -m "chore(node): refresh workspace after upstream"
+            fi
           fi
           git diff --exit-code
+          git diff --cached --exit-code
           gh auth setup-git
-          git push origin HEAD:node-runtime
-          echo "Published node-runtime at $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
+          git push origin "HEAD:refs/heads/$VERSION"
+          echo "Published $VERSION at $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"

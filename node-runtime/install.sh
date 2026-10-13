@@ -26,7 +26,7 @@ verify_sha256() {
 case "${1:-}" in
   --help|-h)
     printf 'Install the Node.js OpenCode fork.\n\n'
-    printf 'Usage: curl -fsSL https://raw.githubusercontent.com/eelgaev/opencode-nodejs/node-runtime/node-runtime/install.sh | sh\n\n'
+    printf 'Usage: curl -fsSL https://raw.githubusercontent.com/eelgaev/opencode-nodejs/v1/node-runtime/install.sh | sh\n\n'
     printf 'Set OPENCODE_NODE_INSTALL_DIR or OPENCODE_NODE_BIN_DIR to change the default locations.\n'
     exit 0
     ;;
@@ -87,7 +87,7 @@ case "$node_bin" in
 esac
 
 printf 'Downloading the Node.js OpenCode fork...\n'
-archive=${OPENCODE_NODE_ARCHIVE_URL:-https://github.com/eelgaev/opencode-nodejs/archive/refs/heads/node-runtime.tar.gz}
+archive=${OPENCODE_NODE_ARCHIVE_URL:-https://github.com/eelgaev/opencode-nodejs/archive/refs/heads/v1.tar.gz}
 curl -fL --retry 3 --progress-bar "$archive" -o "$work/source.tar.gz"
 tar -xzf "$work/source.tar.gz" -C "$release" --strip-components=1
 [ -f "$release/node-runtime/run.mjs" ] || fail 'downloaded archive does not contain the Node.js runner'
