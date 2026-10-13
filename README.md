@@ -26,7 +26,7 @@ The build writes a standalone executable in `packages/cli/dist/node/` for the ho
 
 ## Checks and upstream updates
 
-The [v2 branch checks](.github/workflows/node-check.yml) run on pushes and pull requests. They run selected upstream unit tests under Node.js and Bun, build the Node.js CLI, and check its service startup. The [weekly upstream sync](.github/workflows/node-upstream.yml) tests v1 and v2 separately. It pushes each upstream merge only after that branch's checks pass.
+The [v2 branch checks](.github/workflows/node-check.yml) run on pushes and pull requests. They run selected upstream unit tests under Node.js and Bun, build the Node.js CLI, and check its service and terminal UI startup. The [weekly upstream sync](.github/workflows/node-upstream.yml) tests v1 and v2 separately. It pushes each upstream merge only after that branch's checks pass.
 
 ## Upstream OpenCode
 

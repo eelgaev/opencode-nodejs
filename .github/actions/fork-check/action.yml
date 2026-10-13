@@ -121,3 +121,24 @@ runs:
       shell: bash
       working-directory: packages/cli
       run: bun run script/service-smoke.ts --node
+
+    - name: Check v2 terminal startup
+      if: inputs.version == 'v2'
+      shell: bash
+      working-directory: packages/cli
+      run: |
+        set -euo pipefail
+        binary=$(find dist/node -type f -path '*/bin/opencode2-node' -print -quit)
+        test -x "$binary"
+        export TERM=xterm-256color
+        export OPENCODE_CONFIG_DIR="$RUNNER_TEMP/opencode-v2-tui-config"
+        log="$RUNNER_TEMP/opencode-v2-tui.log"
+        if timeout --signal=INT --kill-after=5s 30s script -q -e -c "stty rows 40 cols 120; $binary --standalone" "$log" </dev/null >/dev/null 2>&1; then
+          status=0
+        else
+          status=$?
+        fi
+        if [ "$status" -ne 124 ] || ! grep -Fq 'Ask anything' "$log"; then
+          tail -c 4000 "$log"
+          exit 1
+        fi
