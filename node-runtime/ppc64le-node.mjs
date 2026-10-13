@@ -14,7 +14,7 @@ const patches = [
 ]
 
 export async function prepareNode() {
-  const target = path.join(path.dirname(fileURLToPath(import.meta.url)), "native/ppc64le/node-ffi-fixed")
+  const target = path.join(path.dirname(fileURLToPath(import.meta.url)), "native/ppc64le/node")
   const cache = target + ".cache.json"
   const sourceState = await stat(process.execPath, { bigint: true })
   const targetState = await stat(target, { bigint: true }).catch(() => undefined)
