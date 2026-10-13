@@ -15,7 +15,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       matrix:
@@ -76,13 +76,34 @@ jobs:
         with:
           version: ${{ matrix.version }}
 
+      - name: Refresh v2 Node workspace
+        if: matrix.version == 'v2'
+        run: |
+          node node-runtime/setup.mjs --sync
+          node node-runtime/setup.mjs --no-frozen-lockfile --filter @opencode/cli... --filter @opencode/app...
+
+      - uses: mlugg/setup-zig@v2
+        if: matrix.version == 'v2'
+        with:
+          version: 0.16.0
+          use-cache: false
+
+      - uses: docker/setup-qemu-action@v3
+        if: matrix.version == 'v2'
+        with:
+          platforms: ppc64le
+
+      - name: Check v2 on ppc64le before publishing
+        if: matrix.version == 'v2'
+        run: sh node-runtime/check-ppc64le.sh
+
       - name: Publish successful upstream merge
         env:
           VERSION: ${{ matrix.version }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          if [ "$VERSION" = v1 ]; then
+          if [ "$VERSION" = v1 ] || [ "$VERSION" = v2 ]; then
             git add pnpm-workspace.yaml pnpm-lock.yaml
             if ! git diff --cached --quiet; then
               git commit -m "chore(node): refresh workspace after upstream"
