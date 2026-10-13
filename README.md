@@ -16,7 +16,8 @@
 > node node-runtime/run.mjs opencode
 > ```
 >
-> See the [v1 Node.js runtime guide](node-runtime/README.md) for `lildax`, ppc64le native modules, and upstream update steps. [Branch checks](.github/workflows/node-check.yml) run on pushes and pull requests; the [weekly sync](.github/workflows/node-upstream.yml) updates both branches only after tests and Node smoke checks pass. The published installation options below install upstream OpenCode.
+> See the [v1 Node.js runtime guide](node-runtime/README.md) for `lildax`, ppc64le native modules, and upstream update steps. [Branch checks](.github/workflows/node-check.yml) run on pushes and pull requests; the [weekly sync](.github/workflows/node-upstream.yml) updates both branches only after focused Bun and Node unit tests plus Node smoke checks pass. The published installation options below install upstream OpenCode.
+> The Node test gate reuses selected upstream test files that do not call Bun APIs. The full upstream suite still runs with Bun.
 
 <p align="center">
   <a href="https://opencode.ai">

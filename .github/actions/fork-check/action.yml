@@ -37,12 +37,36 @@ runs:
       working-directory: packages/core
       run: bun test test/file-access-path.test.ts
 
+    - name: Test v2 CLI under Node
+      if: inputs.version == 'v2'
+      shell: bash
+      working-directory: packages/cli
+      run: node --test --import ../../.github/actions/fork-check/node-test-loader.mjs test/env.test.ts test/node-assets.test.ts
+
+    - name: Test v2 core under Node
+      if: inputs.version == 'v2'
+      shell: bash
+      working-directory: packages/core
+      run: node --test --import ../../.github/actions/fork-check/node-test-loader.mjs test/effect/keyed-mutex.test.ts
+
     - name: Install v1 Node workspace
       if: inputs.version == 'v1'
       shell: bash
       run: |
         node node-runtime/setup.mjs --sync
         node node-runtime/setup.mjs --no-frozen-lockfile
+
+    - name: Test v1 CLI under Node
+      if: inputs.version == 'v1'
+      shell: bash
+      working-directory: packages/opencode
+      run: node --test --import ../../node-runtime/assets.mjs --import ../../.github/actions/fork-check/node-test-loader.mjs test/permission/arity.test.ts test/config/entry-name.test.ts
+
+    - name: Test v1 core under Node
+      if: inputs.version == 'v1'
+      shell: bash
+      working-directory: packages/core
+      run: node --test --import ../../node-runtime/assets.mjs --import ../../.github/actions/fork-check/node-test-loader.mjs test/policy.test.ts
 
     - name: Check v1 CLI entry points
       if: inputs.version == 'v1'
