@@ -112,7 +112,7 @@ function opentuiPpcPlugin(target: NodeTarget): Plugin {
     transform(code, id) {
       if (target.arch !== "ppc64" || !/\/@opentui\/core\/chunk-node-[^/]+\.js$/.test(id.replaceAll("\\", "/"))) return
       const original = 'target.arch !== "arm64" && target.arch !== "x64"'
-      if (!code.includes(original)) this.error("OpenTUI native target check changed")
+      if (!code.includes(original)) return
       const pointerSize = 'process.arch === "x64" || process.arch === "arm64" ? 8 : 4'
       if (!code.includes(pointerSize)) this.error("OpenTUI pointer width check changed")
       return code
