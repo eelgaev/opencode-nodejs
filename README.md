@@ -1,33 +1,32 @@
 # OpenCode for Node.js · v2
 
 [![v2 tests](https://github.com/eelgaev/opencode-nodejs/actions/workflows/node-check.yml/badge.svg?branch=v2)](https://github.com/eelgaev/opencode-nodejs/actions/workflows/node-check.yml?query=branch%3Av2)
-[![v2 binary release](https://github.com/eelgaev/opencode-nodejs/actions/workflows/node-release.yml/badge.svg?branch=v2)](https://github.com/eelgaev/opencode-nodejs/actions/workflows/node-release.yml?query=branch%3Av2)
 
-This fork maintains two OpenCode release lines with working Node.js CLIs. This default branch follows upstream **v2** and publishes a tested, standalone Node.js executable for Linux. The [v1 branch](https://github.com/eelgaev/opencode-nodejs/tree/v1) follows upstream v1 and runs its CLI, terminal UI, and server through a Node.js source runner. Both lines have their own checks and are updated independently.
+This fork maintains two OpenCode release lines with working Node.js CLIs. This branch follows upstream **v2** and builds and tests its Node.js CLI. The [v1 branch](https://github.com/eelgaev/opencode-nodejs/tree/v1) follows upstream v1 and runs its CLI, terminal UI, and server through a Node.js source runner. Both lines have their own checks and are updated independently. The [main branch](https://github.com/eelgaev/opencode-nodejs) is the project landing page.
 
-## Install v2
+## Build and run v2 from source
 
-On Linux **x86_64** or **aarch64**, run:
+The Node.js executable is built from this repository. Bun is the build tool; the resulting CLI runs under Node.js without Bun. With Bun and Node.js 26.4 or newer installed:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/eelgaev/opencode-nodejs/v2/install-node.sh | sh
-~/.local/bin/opencode2-node --version
+bun install --frozen-lockfile
+cd packages/cli
+bun run script/build-node.ts --single --skip-install --outdir=dist/node
+node dist-node/opencode.mjs --version
 ```
 
-The installer downloads the matching binary from this fork's [latest release](https://github.com/eelgaev/opencode-nodejs/releases/latest), verifies its SHA-256 checksum, and installs `opencode2-node` in `~/.local/bin`. The executable includes its Node.js runtime. Add that directory to `PATH` to run `opencode2-node` directly. Set `OPENCODE_NODE_BIN_DIR` to install elsewhere; re-run the installer to update.
+The build writes a standalone executable in `packages/cli/dist/node/` for the host platform. CI verifies the Node.js build and service on Linux **x86_64**; build outputs are used for checks and are not published. For a Node-only install path, use the [v1 installer](https://github.com/eelgaev/opencode-nodejs/blob/v1/node-runtime/README.md).
 
 ## Release lines
 
-| Branch | Upstream line | Node.js distribution | Command |
+| Branch | Upstream line | Node.js path | Command |
 | --- | --- | --- | --- |
 | [v1](https://github.com/eelgaev/opencode-nodejs/tree/v1) | v1 | [Installed source runner](https://github.com/eelgaev/opencode-nodejs/blob/v1/node-runtime/README.md); Linux and macOS | `opencode` |
-| **[v2](https://github.com/eelgaev/opencode-nodejs/tree/v2)** | v2 | Prebuilt Linux binary for x86_64 and aarch64 | `opencode2-node` |
+| **[v2](https://github.com/eelgaev/opencode-nodejs/tree/v2)** | v2 | Node.js CLI built from source; verified in CI | `opencode2-node` |
 
-## Checks and releases
+## Checks and upstream updates
 
-The [v2 branch checks](.github/workflows/node-check.yml) run on pushes and pull requests. They run selected upstream unit tests under Node.js and Bun, build the Node.js CLI, and check its service startup. The [binary release workflow](.github/workflows/node-release.yml) repeats those checks on x86_64 and aarch64 runners, then publishes both binaries and checksums only after both pass. The [weekly upstream sync](.github/workflows/node-upstream.yml) tests v1 and v2 separately before pushing either update.
-
-Contributors can build the CLI from source with [`packages/cli/script/build-node.ts`](packages/cli/script/build-node.ts). This build uses Bun; installing and running the published executable does not.
+The [v2 branch checks](.github/workflows/node-check.yml) run on pushes and pull requests. They run selected upstream unit tests under Node.js and Bun, build the Node.js CLI, and check its service startup. The [weekly upstream sync](.github/workflows/node-upstream.yml) tests v1 and v2 separately. It pushes each upstream merge only after that branch's checks pass.
 
 ## Upstream OpenCode
 
