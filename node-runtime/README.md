@@ -37,7 +37,7 @@ node node-runtime/setup.mjs --no-frozen-lockfile
 
 Review changes to Node-specific patches and `pnpm-lock.yaml` after each merge. The fork's root Bun files stay available for upstream development.
 
-The fork keeps `node-check.yml`, `node-upstream.yml`, and `node-runtime.yml` under `.github/workflows`. When updating manually, remove any upstream workflows added by a merge before committing. The [weekly upstream sync](../.github/workflows/node-upstream.yml) runs from the fork's default `v2` branch and updates `v1` and `v2` independently. It runs focused unit tests and Node smoke checks before pushing either merge. It runs Mondays at 04:17 UTC and supports manual dispatch. A failed check leaves that branch unchanged. The [branch checks](../.github/workflows/node-check.yml) also run on pushes and pull requests to each branch.
+The fork keeps `node-check.yml`, `node-upstream.yml`, and `node-runtime.yml` under `.github/workflows`. When updating manually, remove any upstream workflows added by a merge before committing. The [weekly upstream sync](https://github.com/eelgaev/opencode-nodejs/blob/main/.github/workflows/node-upstream.yml) runs from the fork's default `main` branch and updates `v1` and `v2` independently. It runs focused unit tests and Node smoke checks before pushing either merge. It runs Mondays at 04:17 UTC and supports manual dispatch. A failed check leaves that branch unchanged. The [branch checks](../.github/workflows/node-check.yml) also run on pushes and pull requests to each branch.
 
 ## Linux ppc64le native modules
 

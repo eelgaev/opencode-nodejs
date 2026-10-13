@@ -3,7 +3,7 @@
 [![v1 tests](https://github.com/eelgaev/opencode-nodejs/actions/workflows/node-check.yml/badge.svg?branch=v1)](https://github.com/eelgaev/opencode-nodejs/actions/workflows/node-check.yml?query=branch%3Av1)
 [![v2 tests](https://github.com/eelgaev/opencode-nodejs/actions/workflows/node-check.yml/badge.svg?branch=v2)](https://github.com/eelgaev/opencode-nodejs/actions/workflows/node-check.yml?query=branch%3Av2)
 
-This fork maintains two OpenCode release lines with working Node.js CLIs. This branch follows upstream **v1** and runs its CLI, terminal UI, and server from source on Node.js. The default [v2 branch](https://github.com/eelgaev/opencode-nodejs/tree/v2) follows upstream v2 and publishes a standalone Node.js binary. Both lines have their own checks and are updated independently.
+This fork maintains two OpenCode release lines with working Node.js CLIs. This branch follows upstream **v1** and runs its CLI, terminal UI, and server from source on Node.js. The [v2 branch](https://github.com/eelgaev/opencode-nodejs/tree/v2) follows upstream v2 and builds its Node.js CLI in CI. Both lines have their own checks and are updated independently. The [main branch](https://github.com/eelgaev/opencode-nodejs) is the project landing page.
 
 ## Install v1
 
@@ -18,10 +18,10 @@ The installer supports Linux **x86_64**, **aarch64**, and **ppc64le**, plus macO
 
 ## Release lines
 
-| Branch | Upstream line | Node.js distribution | Command |
+| Branch | Upstream line | Node.js path | Command |
 | --- | --- | --- | --- |
 | **[v1](https://github.com/eelgaev/opencode-nodejs/tree/v1)** | v1 | Installed source runner; Linux and macOS | `opencode` |
-| [v2](https://github.com/eelgaev/opencode-nodejs/tree/v2) | v2 | [Prebuilt Linux binary](https://github.com/eelgaev/opencode-nodejs/releases/latest) for x86_64 and aarch64 | `opencode2-node` |
+| [v2](https://github.com/eelgaev/opencode-nodejs/tree/v2) | v2 | Node.js CLI built from source; verified in CI | `opencode2-node` |
 
 ## Run from source
 
