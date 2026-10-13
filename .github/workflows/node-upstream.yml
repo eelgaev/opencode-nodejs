@@ -45,7 +45,7 @@ jobs:
             fi
             while IFS= read -r -d '' file; do
               case "$file" in
-                .github/workflows/node-check.yml|.github/workflows/node-upstream.yml|.github/workflows/node-runtime.yml)
+                .github/workflows/node-check.yml|.github/workflows/node-release.yml|.github/workflows/node-upstream.yml|.github/workflows/node-runtime.yml)
                   echo "Conflict in a fork workflow: $file" >&2
                   exit 1
                   ;;
@@ -59,7 +59,7 @@ jobs:
           fi
           while IFS= read -r -d '' file; do
             case "$file" in
-              .github/workflows/node-check.yml|.github/workflows/node-upstream.yml|.github/workflows/node-runtime.yml) ;;
+              .github/workflows/node-check.yml|.github/workflows/node-release.yml|.github/workflows/node-upstream.yml|.github/workflows/node-runtime.yml) ;;
               *) git rm -f -- "$file" ;;
             esac
           done < <(git ls-files -z .github/workflows)

@@ -1,0 +1,80 @@
+name: Publish v2 Node binary
+
+on:
+  push:
+    branches: [v2]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: node-v2-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            target: linux-x64
+            artifact: linux-x86_64
+          - runner: ubuntu-24.04-arm
+            target: linux-arm64
+            artifact: linux-aarch64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/fork-check
+        with:
+          version: v2
+      - name: Package tested binary
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+          ARTIFACT: ${{ matrix.artifact }}
+        run: |
+          set -euo pipefail
+          binary="packages/cli/dist/node/cli-node-$TARGET/bin/opencode2-node"
+          "$binary" --version
+          asset="opencode2-node-$ARTIFACT.tar.gz"
+          tar -C "$(dirname "$binary")" -czf "$asset" opencode2-node
+          sha256sum "$asset" > "$asset.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: node-${{ matrix.artifact }}
+          path: |
+            opencode2-node-${{ matrix.artifact }}.tar.gz
+            opencode2-node-${{ matrix.artifact }}.tar.gz.sha256
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-24.04
+    if: github.ref == 'refs/heads/v2'
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: node-*
+          merge-multiple: true
+          path: dist
+      - name: Publish binaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag="node-v2-$GITHUB_SHA"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" dist/* --clobber
+            gh release edit "$tag" --latest
+          else
+            gh release create "$tag" dist/* \
+              --target "$GITHUB_SHA" \
+              --title "Node.js v2 $(date -u +%Y-%m-%d)" \
+              --notes "Tested Linux x86_64 and aarch64 Node.js builds from v2." \
+              --latest
+          fi

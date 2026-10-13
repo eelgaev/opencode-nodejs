@@ -1,13 +1,14 @@
 > [!NOTE]
 > This fork maintains two OpenCode release lines: [v1](https://github.com/eelgaev/opencode-nodejs/tree/v1) and [v2](https://github.com/eelgaev/opencode-nodejs/tree/v2). This default `v2` branch tracks upstream `v2`, whose CLI has a Node.js build. The `v1` branch tracks upstream `v1` and has the fork's Node.js source runner.
 >
-> Install the v1 Node.js fork on Linux or macOS:
+> Install the v2 Node.js CLI on Linux (x86_64 or aarch64):
 >
 > ```sh
-> curl -fsSL https://raw.githubusercontent.com/eelgaev/opencode-nodejs/v1/node-runtime/install.sh | sh
+> curl -fsSL https://raw.githubusercontent.com/eelgaev/opencode-nodejs/v2/install-node.sh | sh
+> ~/.local/bin/opencode2-node --version
 > ```
 >
-> The v2 Node.js CLI is built and tested in [branch checks](.github/workflows/node-check.yml), but this fork does not yet publish a v2 Node.js installer or binary. The installation options below install upstream OpenCode. The [weekly sync](.github/workflows/node-upstream.yml) updates both branches after their checks pass.
+> The installer downloads a tested, prebuilt binary from this fork's [releases](https://github.com/eelgaev/opencode-nodejs/releases). Set `OPENCODE_NODE_BIN_DIR` to choose another directory. To install the older release line, use the [v1 Node.js installer](https://github.com/eelgaev/opencode-nodejs/blob/v1/node-runtime/README.md). The installation options below install upstream OpenCode. The [weekly sync](.github/workflows/node-upstream.yml) updates both branches after their checks pass.
 
 <p align="center">
   <a href="https://opencode.ai">
