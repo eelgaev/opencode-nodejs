@@ -1,6 +1,6 @@
 # Node.js runtime
 
-This is a secondary runtime for the two command line entry points. The root Bun workspace, lockfile, scripts, and release flow remain the upstream path.
+This runtime enables OpenCode v1 on Linux ppc64le through Node.js. It also runs the two command line entry points on Linux x86_64 and aarch64 and on macOS. The root Bun workspace, lockfile, scripts, and release flow remain available for upstream development.
 
 Use Node.js 26.4 or newer. The source runner uses Node's synchronous module hooks, TypeScript loader, SQLite, and FFI. On a clean checkout:
 
