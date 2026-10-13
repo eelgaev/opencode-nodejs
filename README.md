@@ -29,7 +29,7 @@ The v2 branch builds a Node.js CLI from source. The build uses Bun; the resultin
 
 ## Checks and upstream updates
 
-Both source branches run [GitHub Actions checks](https://github.com/eelgaev/opencode-nodejs/actions/workflows/node-check.yml) on pushes and pull requests. They run selected upstream unit tests under Node.js and Bun, then exercise the relevant Node.js CLI. V1 checks terminal startup and server health; v2 checks its Node.js build and service startup.
+Both source branches run [GitHub Actions checks](https://github.com/eelgaev/opencode-nodejs/actions/workflows/node-check.yml) on pushes and pull requests. They run selected upstream unit tests under Node.js and Bun, then exercise the relevant Node.js CLI. V1 checks terminal startup and server health; v2 checks its Node.js build, service, and terminal UI startup.
 
 The [upstream sync workflow](.github/workflows/node-upstream.yml) runs weekly or on manual dispatch. It merges upstream v1 and v2 independently, runs the branch checks, and pushes each branch only if its checks pass. No binary release is part of that workflow.
 
