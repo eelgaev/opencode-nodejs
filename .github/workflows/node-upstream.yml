@@ -1,0 +1,95 @@
+name: Node upstream sync
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 4 * * 1"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: node-upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [v1, v2]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.version }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Merge upstream ${{ matrix.version }} and keep fork workflows
+        shell: bash
+        env:
+          VERSION: ${{ matrix.version }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add upstream https://github.com/anomalyco/opencode.git
+          git fetch --no-tags upstream "+refs/heads/$VERSION:refs/remotes/upstream/$VERSION"
+          git switch -c upstream-merge
+          if ! git merge --no-ff --no-commit "upstream/$VERSION"; then
+            if [ -z "$(git diff --name-only --diff-filter=U)" ]; then
+              echo "Upstream merge failed without a resolvable conflict" >&2
+              exit 1
+            fi
+            while IFS= read -r -d '' file; do
+              case "$file" in
+                .github/workflows/node-check.yml|.github/workflows/node-upstream.yml|.github/workflows/node-runtime.yml)
+                  echo "Conflict in a fork workflow: $file" >&2
+                  exit 1
+                  ;;
+                .github/workflows/*) git rm -f -- "$file" ;;
+                *)
+                  echo "Unresolved upstream conflict: $file" >&2
+                  exit 1
+                  ;;
+              esac
+            done < <(git diff --name-only --diff-filter=U -z)
+          fi
+          while IFS= read -r -d '' file; do
+            case "$file" in
+              .github/workflows/node-check.yml|.github/workflows/node-upstream.yml|.github/workflows/node-runtime.yml) ;;
+              *) git rm -f -- "$file" ;;
+            esac
+          done < <(git ls-files -z .github/workflows)
+          if git diff --name-only --diff-filter=U | grep -q .; then
+            echo "Upstream merge has unresolved conflicts" >&2
+            exit 1
+          fi
+          if [ -f "$(git rev-parse --git-path MERGE_HEAD)" ]; then
+            git commit -m "chore: merge upstream $VERSION"
+          fi
+          echo "Testing upstream $VERSION $(git rev-parse --short "upstream/$VERSION")" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: ./.github/actions/fork-check
+        with:
+          version: ${{ matrix.version }}
+
+      - name: Publish successful upstream merge
+        env:
+          VERSION: ${{ matrix.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ "$VERSION" = v1 ]; then
+            git add pnpm-workspace.yaml pnpm-lock.yaml
+            if ! git diff --cached --quiet; then
+              git commit -m "chore(node): refresh workspace after upstream"
+            fi
+          fi
+          git diff --exit-code
+          git diff --cached --exit-code
+          gh auth setup-git
+          git push origin "HEAD:refs/heads/$VERSION"
+          echo "Published $VERSION at $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
