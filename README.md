@@ -25,7 +25,7 @@ See the [v1 runtime guide](https://github.com/eelgaev/opencode-nodejs/blob/v1/no
 
 ### v2: build for ppc64le with Node.js
 
-The v2 branch builds its CLI and web UI using Node.js and pnpm. On ppc64le, it builds OpenTUI, the PTY addon, and the filesystem watcher from source. See the [v2 build instructions](https://github.com/eelgaev/opencode-nodejs/tree/v2#build-and-run-v2-on-ppc64le) for the Zig cross build prerequisite and commands. Bun is not required for this path. The fork does not publish binary downloads.
+The v2 branch builds its CLI using Node.js and pnpm. On ppc64le, it builds the PTY addon and filesystem watcher from source. OpenTUI's ppc64le library and the web UI archive are built on an x86_64 or aarch64 host, then copied to the ppc64le checkout. See the [v2 build instructions](https://github.com/eelgaev/opencode-nodejs/tree/v2#build-and-run-v2-on-ppc64le). Bun is not required for this path. The fork does not publish binary downloads.
 
 ## Checks and upstream updates
 
