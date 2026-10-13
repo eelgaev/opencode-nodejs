@@ -1,6 +1,8 @@
 #!/bin/sh
 set -eu
 
+node node-runtime/setup.mjs --frozen-lockfile --filter @opencode/cli... --filter @opencode/app...
+node node-runtime/build-app.mjs
 node node-runtime/build-opentui.mjs
 docker run --rm --platform linux/ppc64le -v "$PWD:/workspace" -w /workspace ubuntu:24.04 bash -euxo pipefail -c '
   apt-get update

@@ -6,7 +6,15 @@ This fork exists to run OpenCode on **Linux ppc64le with Node.js**. This branch 
 
 ## Build and run v2 on ppc64le
 
-V2 builds and runs with Node.js 26.11.1 and pnpm 10. Bun is not required. Install Git, Python 3, a C++ compiler, make, and Node.js 26.11.1 on the ppc64le machine. Then, from a v2 checkout:
+V2 builds and runs with Node.js 26.11.1 and pnpm 10. Bun is not required. Two assets must be built on an x86_64 or aarch64 Linux machine: OpenTUI's ppc64le library and the web UI archive. Use a v2 checkout with Node.js 26.11.1 and Zig 0.16.0 on that build machine:
+
+```sh
+node node-runtime/setup.mjs --frozen-lockfile --filter @opencode/cli... --filter @opencode/app...
+node node-runtime/build-app.mjs
+ZIG=/path/to/zig node node-runtime/build-opentui.mjs
+```
+
+Copy `node-runtime/native/app-archive.bin` and `node-runtime/native/ppc64le/libopentui.so` into the same paths in a v2 checkout on the ppc64le machine. Install Git, Python 3, a C++ compiler, make, and Node.js 26.11.1 there. Then run:
 
 ```sh
 node node-runtime/setup.mjs --frozen-lockfile --filter @opencode/cli... --filter @opencode/app...
@@ -16,9 +24,9 @@ node node-runtime/run.mjs --version
 node node-runtime/run.mjs --standalone
 ```
 
-OpenTUI 0.5.17 does not publish a ppc64le library. Before `node-runtime/build.mjs`, build it with Zig 0.16.0 using `ZIG=/path/to/zig node node-runtime/build-opentui.mjs`. Zig 0.16.0 has no official ppc64le executable download, so run that cross build on an x86_64 or aarch64 Linux machine and copy `node-runtime/native/ppc64le/libopentui.so` into the same path on the ppc64le checkout. A locally built Zig 0.16.0 on ppc64le also works. The OpenTUI source is pinned to v0.5.17; the script checks the workspace version before building.
+OpenTUI 0.5.17 does not publish a ppc64le library, and Lightning CSS does not publish a ppc64le binding needed to build the web UI. These two assets are built on the other machine using Node.js and Zig; the ppc64le CLI bundle and its PTY and watcher addons are built on ppc64le. A locally built Zig 0.16.0 on ppc64le can also build OpenTUI there. The OpenTUI source is pinned to v0.5.17; the script checks the workspace version before building.
 
-The build produces `packages/cli/dist-node/opencode.mjs` plus local native assets and the web UI archive. The runner uses a private, verified Node FFI fix on ppc64le when it recognizes the affected official Node 26.11.1 binary. It does not alter system Node. See [the source patch](node-runtime/patches/node-libffi-ppc64le-toc.patch) for rebuilding Node instead. No binaries are published by this fork.
+The ppc64le build produces `packages/cli/dist-node/opencode.mjs` and local native assets. The runner uses a private, verified Node FFI fix on ppc64le when it recognizes the affected official Node 26.11.1 binary. It does not alter system Node. See [the source patch](node-runtime/patches/node-libffi-ppc64le-toc.patch) for rebuilding Node instead. No binaries are published by this fork.
 
 On Linux aarch64 or x86_64, the same Node commands build the CLI using the prebuilt native packages. The v2 branch also retains its Bun development workflow from upstream; the commands above exercise this fork's Node path.
 
